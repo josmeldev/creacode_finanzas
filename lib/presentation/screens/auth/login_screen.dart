@@ -45,7 +45,7 @@ Future login() async {
       .then((value) {
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const BottomNav()));
-    ToastMessage().toastMessage('Success!', Colors.green);
+    ToastMessage().toastMessage('Exitoso!', Colors.green);
     if (mounted) {  // Añade esta verificación
       setState(() {
         loading = false;

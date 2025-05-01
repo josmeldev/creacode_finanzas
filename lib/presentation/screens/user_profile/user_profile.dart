@@ -12,6 +12,7 @@ import '../../widgets/button.dart';
 import '../../widgets/null_error_message_widget.dart';
 import '../auth/login_screen.dart';
 import 'package:flutter_switch/flutter_switch.dart';
+import 'package:creacode_finanzas/logic/flutter_toast.dart';
 
 class UserProfileScreeen extends StatefulWidget {
   const UserProfileScreeen({super.key});
@@ -26,47 +27,64 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
   final user = FirebaseAuth.instance.currentUser!;
 
 void clearUserSplitData() async {
-  // Obtener el usuario autenticado
-  User? user = FirebaseAuth.instance.currentUser;
+  // Mostrar diálogo de confirmación primero
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Confirmación'
+        ),
+        content: const Text('¿Estás seguro de que quieres comenzar un nuevo mes? Esto reiniciará todos tus datos.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Cerrar el diálogo sin hacer nada
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancelar', style: TextStyle(color: kGreenColor),),
+          ),
+          TextButton(
+            onPressed: () {
+              // Cerrar el diálogo y continuar con la acción
+              Navigator.of(context).pop();
+              
+              // Obtener el usuario autenticado
+              User? user = FirebaseAuth.instance.currentUser;
 
-  if (user != null) {
-    // En lugar de eliminar los datos, establecemos valores iniciales
-    DatabaseReference splitRef =
-        ref.child(user.uid.toString()).child('split');
-    splitRef.set({
-      'amount': 0,
-      'need': 0,
-      'expenses': 0,
-      'savings': 0,
-      'totalBalance': 0,
-      'needAvailableBalance': 0,
-      'expensesAvailableBalance': 0,
-      'count': 1,
-      'isEFenabled': false,
-      'isCPenabled': false,
-      'isAutopayOn': false,
-      'targetEmergencyFunds': 0,
-      'collectedEmergencyFunds': 0,
-    }).then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Comienzando nuevo mes...'),
-          backgroundColor: kGreenColor,
-        ),
+              if (user != null) {
+                // En lugar de eliminar los datos, establecemos valores iniciales
+                DatabaseReference splitRef =
+                    ref.child(user.uid.toString()).child('split');
+                splitRef.set({
+                  'amount': 0,
+                  'need': 0,
+                  'expenses': 0,
+                  'savings': 0,
+                  'totalBalance': 0,
+                  'needAvailableBalance': 0,
+                  'expensesAvailableBalance': 0,
+                  'count': 1,
+                  'isEFenabled': false,
+                  'isCPenabled': false,
+                  'isAutopayOn': false,
+                  'targetEmergencyFunds': 0,
+                  'collectedEmergencyFunds': 0,
+                }).then((_) {
+                    ToastMessage().toastMessage('Comenzando un nuevo mes!', Colors.green);
+                }).catchError((error) {
+                    ToastMessage().toastMessage('Error al comenzar un nuevo mes!', Colors.red);
+                });
+              } else {
+                print("No hay usuario autenticado.");
+              }
+            },
+            child: const Text('OK', style: TextStyle(color: kGreenColor),),
+          ),
+        ],
       );
-    }).catchError((error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al reiniciar datos: $error'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    });
-  } else {
-    print("No hay usuario autenticado.");
-  }
+    },
+  );
 }
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(

@@ -86,7 +86,7 @@ class _NeedPayersPayScreenState extends State<NeedPayersPayScreen> {
           .set(allTransactionPayer);
 
       Navigator.pop(context);
-      ToastMessage().toastMessage('Success!', Colors.green);
+      ToastMessage().toastMessage('Exitoso!', Colors.green);
     }
   }
 
