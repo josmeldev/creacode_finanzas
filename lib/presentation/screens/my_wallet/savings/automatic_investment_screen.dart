@@ -27,7 +27,7 @@ class _AutoInvestmentScreenState extends State<AutoInvestmentScreen> {
 
   String? checkValid(value) {
     if (value.isEmpty) {
-      return 'Please enter the amount';
+      return 'Por favor ingrese el monto';
     }
     return null;
   }
@@ -61,7 +61,7 @@ class _AutoInvestmentScreenState extends State<AutoInvestmentScreen> {
                                 width: constraints.maxWidth * 0.03,
                               ),
                               const Text(
-                                'Automatic Investment',
+                                'Inversión automática',
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     fontSize: 28, fontWeight: FontWeight.w400),
@@ -75,7 +75,7 @@ class _AutoInvestmentScreenState extends State<AutoInvestmentScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Select risk capacity range',
+                                'Seleccione el rango de riesgo',
                                 style: TextStyle(
                                     fontSize: 18,
                                     color: Theme.of(context).primaryColor,
@@ -111,7 +111,7 @@ class _AutoInvestmentScreenState extends State<AutoInvestmentScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Select years for investment',
+                                'Seleccione años para invertir',
                                 style: TextStyle(
                                     fontSize: 18,
                                     color: Theme.of(context).primaryColor,
@@ -144,7 +144,7 @@ class _AutoInvestmentScreenState extends State<AutoInvestmentScreen> {
                             height: constraints.maxHeight * 0.05,
                           ),
                           Text(
-                            'Enter amount to invest',
+                            'Introduzca el monto a invertir',
                             style: TextStyle(
                                 fontSize: 18,
                                 color: Theme.of(context).primaryColor,
@@ -154,7 +154,7 @@ class _AutoInvestmentScreenState extends State<AutoInvestmentScreen> {
                             height: constraints.maxHeight * 0.02,
                           ),
                           CustomTextField(
-                              hint: 'Amount',
+                              hint: 'Cantidad',
                               iconName: Icons.attach_money,
                               controller: amountController,
                               validator: checkValid,
@@ -168,18 +168,18 @@ class _AutoInvestmentScreenState extends State<AutoInvestmentScreen> {
                           TButton(
                               constraints: constraints,
                               btnColor: Theme.of(context).primaryColor,
-                              btnText: 'Continue',
+                              btnText: 'Continuar',
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
                                   if (investmentYears == 0.0 ||
                                       currentValue == 0.0) {
                                     ToastMessage().toastMessage(
-                                        'Please select number of years & risk capacity',
+                                        'Por favor seleccione número de años y capacidad de riesgo',
                                         Colors.red);
                                   } else {
                                     Navigator.of(context).pop();
                                     ToastMessage().toastMessage(
-                                        'Data sent successfully!',
+                                        '¡Datos enviados exitosamente!',
                                         Colors.green);
                                   }
                                 }

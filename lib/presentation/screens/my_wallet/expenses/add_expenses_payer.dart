@@ -153,7 +153,7 @@ class _AddExpensesPayerState extends State<AddExpensesPayer> {
                                 width: constraints.maxWidth * 0.03,
                               ),
                               const Text(
-                                'Account Pay',
+                                'Pago de cuenta',
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     fontSize: 28, fontWeight: FontWeight.w400),
@@ -164,8 +164,8 @@ class _AddExpensesPayerState extends State<AddExpensesPayer> {
                             height: constraints.maxHeight * 0.03,
                           ),
                           CustomTextField(
-                            hint: 'Full name',
-                            iconName: Icons.person,
+                            hint: 'Escribe tu capricho',
+                            iconName: Icons.shopping_bag,
                             controller: nameController,
                             validator: _validateFormField,
                           ),
@@ -173,7 +173,7 @@ class _AddExpensesPayerState extends State<AddExpensesPayer> {
                             height: constraints.maxHeight * 0.02,
                           ),
                           CustomTextField(
-                              hint: 'Amount',
+                              hint: 'Precio',
                               iconName: Icons.attach_money,
                               controller: amountController,
                               validator: _validateNumber,
@@ -185,8 +185,8 @@ class _AddExpensesPayerState extends State<AddExpensesPayer> {
                             height: constraints.maxHeight * 0.02,
                           ),
                           CustomTextField(
-                              hint: 'Account number',
-                              iconName: Icons.account_balance,
+                              hint: 'Método de pago',
+                              iconName: Icons.credit_card,
                               controller: accountNumberController,
                               validator: _validateNumber,
                               keyboardType: TextInputType.number,
@@ -197,7 +197,7 @@ class _AddExpensesPayerState extends State<AddExpensesPayer> {
                             height: constraints.maxHeight * 0.02,
                           ),
                           CustomTextField(
-                              hint: 'Phone number',
+                              hint: 'Número de teléfono',
                               iconName: Icons.call,
                               controller: phoneNumberController,
                               validator: _validateNumber,
@@ -209,7 +209,7 @@ class _AddExpensesPayerState extends State<AddExpensesPayer> {
                             height: constraints.maxHeight * 0.02,
                           ),
                           CustomTextField(
-                            hint: 'Short description',
+                            hint: 'Descripción corta',
                             iconName: Icons.subject,
                             controller: shortDescriptionController,
                             validator: null,
@@ -220,7 +220,7 @@ class _AddExpensesPayerState extends State<AddExpensesPayer> {
                           TButton(
                               constraints: constraints,
                               btnColor: Theme.of(context).primaryColor,
-                              btnText: 'Pay Now',
+                              btnText: 'Pagar',
                               onPressed: _addAndPay),
                           SizedBox(
                             height: constraints.maxHeight * 0.04,
