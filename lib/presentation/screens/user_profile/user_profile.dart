@@ -26,66 +26,145 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
 
   final user = FirebaseAuth.instance.currentUser!;
 
-void clearUserSplitData() async {
-  // Mostrar diálogo de confirmación primero
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Confirmación'
-        ),
-        content: const Text('¿Estás seguro de que quieres comenzar un nuevo mes? Esto reiniciará todos tus datos.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // Cerrar el diálogo sin hacer nada
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cancelar', style: TextStyle(color: kGreenColor),),
+  void clearUserSplitData() async {
+    // Mostrar diálogo de confirmación primero
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirmación',
+            style: TextStyle(color: kGreenColor),
           ),
-          TextButton(
-            onPressed: () {
-              // Cerrar el diálogo y continuar con la acción
-              Navigator.of(context).pop();
-              
-              // Obtener el usuario autenticado
-              User? user = FirebaseAuth.instance.currentUser;
+          content: const Text(
+            '¿Estás seguro de que quieres comenzar un nuevo mes? Esto reiniciará todos tus datos.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Cerrar el diálogo sin hacer nada
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(color: kGreenColor),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Cerrar el diálogo y continuar con la acción
+                Navigator.of(context).pop();
 
-              if (user != null) {
-                // En lugar de eliminar los datos, establecemos valores iniciales
-                DatabaseReference splitRef =
-                    ref.child(user.uid.toString()).child('split');
-                splitRef.set({
-                  'amount': 0,
-                  'need': 0,
-                  'expenses': 0,
-                  'savings': 0,
-                  'totalBalance': 0,
-                  'needAvailableBalance': 0,
-                  'expensesAvailableBalance': 0,
-                  
-                  'count': 1,
-                  'isEFenabled': false,
-                  'isCPenabled': false,
-                  'isAutopayOn': false,
-                  'targetEmergencyFunds': 0,
-                  'collectedEmergencyFunds': 0,
-                }).then((_) {
-                    ToastMessage().toastMessage('Comenzando un nuevo mes!', Colors.green);
-                }).catchError((error) {
-                    ToastMessage().toastMessage('Error al comenzar un nuevo mes!', Colors.red);
-                });
-              } else {
-                print("No hay usuario autenticado.");
-              }
-            },
-            child: const Text('OK', style: TextStyle(color: kGreenColor),),
-          ),
-        ],
-      );
-    },
-  );
-}
+                // Obtener el usuario autenticado
+                User? user = FirebaseAuth.instance.currentUser;
+
+                if (user != null) {
+                  DatabaseReference splitRef = ref
+                      .child(user.uid.toString())
+                      .child('split');
+
+                  // Obtenemos los valores actuales antes de reiniciar
+                  DataSnapshot snapshot = await splitRef.get();
+                  if (snapshot.exists) {
+                    Map<dynamic, dynamic> currentData =
+                        snapshot.value as Map<dynamic, dynamic>;
+
+                    // Obtenemos el valor del ahorro disponible y totalSavings actual
+                    // Obtenemos el valor del ahorro disponible y totalSavings actual
+                    double currentSavings =
+                        (currentData['savings'] ?? 0)
+                            .toDouble();
+                    double currentTotalSavings =
+                        (currentData['totalSavings'] ?? 0).toDouble();
+
+                    // Sumamos el ahorro disponible actual al total acumulado
+                    double newTotalSavings =
+                        currentTotalSavings + currentSavings;
+
+                    // Establecemos los nuevos valores, incluyendo el totalSavings actualizado
+                    splitRef
+                        .set({
+                          'amount': 0,
+                          'need': 0,
+                          'expenses': 0,
+                          'savings': 0,
+                          'totalBalance': 0,
+                          'needAvailableBalance': 0,
+                          'expensesAvailableBalance': 0,
+                          'savingsAvailableBalance': 0,
+                          'totalSavings':
+                              newTotalSavings, // Acumulamos el ahorro del mes anterior
+                          'count': 1,
+                          'isEFenabled': false,
+                          'isCPenabled': false,
+                          'isAutopayOn': false,
+                          'targetEmergencyFunds': 0,
+                          'collectedEmergencyFunds': 0,
+                          'savingsSpendings':
+                              0, // Reiniciamos los gastos del mes
+                          'needSpendings': 0,
+                          'expensesSpendings': 0,
+                        })
+                        .then((_) {
+                          ToastMessage().toastMessage(
+                            'Comenzando un nuevo mes! Ahorro acumulado: $newTotalSavings',
+                            Colors.green,
+                          );
+                        })
+                        .catchError((error) {
+                          ToastMessage().toastMessage(
+                            'Error al comenzar un nuevo mes!',
+                            Colors.red,
+                          );
+                        });
+                  } else {
+                    // Si no hay datos existentes, inicializar con valores predeterminados
+                    splitRef
+                        .set({
+                          'amount': 0,
+                          'need': 0,
+                          'expenses': 0,
+                          'savings': 0,
+                          'totalBalance': 0,
+                          'needAvailableBalance': 0,
+                          'expensesAvailableBalance': 0,
+                          'savingsAvailableBalance': 0,
+                          'totalSavings': 0,
+                          'count': 1,
+                          'isEFenabled': false,
+                          'isCPenabled': false,
+                          'isAutopayOn': false,
+                          'targetEmergencyFunds': 0,
+                          'collectedEmergencyFunds': 0,
+                          'savingsSpendings': 0,
+                          'needSpendings': 0,
+                          'expensesSpendings': 0,
+                        })
+                        .then((_) {
+                          ToastMessage().toastMessage(
+                            'Comenzando un nuevo mes!',
+                            Colors.green,
+                          );
+                        })
+                        .catchError((error) {
+                          ToastMessage().toastMessage(
+                            'Error al comenzar un nuevo mes!',
+                            Colors.red,
+                          );
+                        });
+                  }
+                } else {
+                  print("No hay usuario autenticado.");
+                }
+              },
+              child: const Text('OK', style: TextStyle(color: kGreenColor)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(

@@ -113,6 +113,25 @@ class _SavingsScreenState extends State<SavingsScreen> {
                                   },
                                 ),
 
+                                CustomCard(
+                                  orientation: orientation,
+                                  verHeight: constraints.maxHeight * 0.15,
+                                  horiHeight: constraints.maxHeight * 0.5,
+                                  verWidth:
+                                      constraints.maxWidth *
+                                      0.95, // Ancho completo
+                                  horiWidth:
+                                      constraints.maxWidth *
+                                      0.95, // Ancho completo
+                                  cardTitle: 'Ahorro Total',
+                                  cardBalance:
+                                      map['totalSavings'] == null
+                                          ? '0'
+                                          : map['totalSavings'].toStringAsFixed(
+                                            0,
+                                          ),
+                                ),
+                                SizedBox(height: constraints.maxHeight * 0.03),
                                 // Transacciones title
                                 const Text(
                                   'Transacciones',
