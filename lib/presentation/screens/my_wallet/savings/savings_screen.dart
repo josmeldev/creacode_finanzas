@@ -27,162 +27,166 @@ class _SavingsScreenState extends State<SavingsScreen> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Object>(
-        stream: ref.child(user.uid.toString()).child('split').onValue,
-        builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData) {
-            if (snapshot.data.snapshot.value == null) {
-              return const NullErrorMessage(
-                message: '¡Algo salió mal!',
-              );
-            } else {
-              Map<dynamic, dynamic> map = snapshot.data.snapshot.value;
-              return Scaffold(
-                body: SafeArea(
-                  child: LayoutBuilder(
-                    builder:
-                        (BuildContext context, BoxConstraints constraints) {
-                      return OrientationBuilder(
-                        builder:
-                            (BuildContext context, Orientation orientation) {
-                          return SingleChildScrollView(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 18, vertical: 15),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Balance card
-                                  BalanceCard(
-                                    amount: map['savings'].toStringAsFixed(0),
-                                    constraints:
-                                        orientation == Orientation.portrait
-                                            ? constraints.maxHeight * 0.25
-                                            : constraints.maxHeight * 0.8,
-                                  ),
-                                  SizedBox(
-                                    height: constraints.maxHeight * 0.03,
-                                  ),
-                                  
-                                  // Cards for statistics
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      CustomCard(
-                                        orientation: orientation,
-                                        verHeight: constraints.maxHeight * 0.15,
-                                        horiHeight: constraints.maxHeight * 0.5,
-                                        verWidth: constraints.maxHeight * 0.23,
-                                        horiWidth: constraints.maxWidth * 0.4,
-                                        cardTitle: 'Ingreso',
-                                        cardBalance: map['savings']
-                                            .toStringAsFixed(0),
-                                      ),
-                                      CustomCard(
-                                        orientation: orientation,
-                                        verHeight: constraints.maxHeight * 0.15,
-                                        horiHeight: constraints.maxHeight * 0.5,
-                                        verWidth: constraints.maxHeight * 0.23,
-                                        horiWidth: constraints.maxWidth * 0.4,
-                                        cardTitle: 'Gastos',
-                                        cardBalance:
-                                            map['savingsSpendings'] == null
-                                                ? 0.toString()
-                                                : map['savingsSpendings']
-                                                    .toStringAsFixed(0),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: constraints.maxHeight * 0.04,
-                                  ),
-                                  
-                                  // Botón para agregar nuevo ahorro
-                                  TButton(
-                                    constraints: constraints,
-                                    btnColor: Theme.of(context).primaryColor,
-                                    btnText: '+ Gastar',
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const AddSavingsPayer()
-                                        )
-                                      );
-                                    }
-                                  ),
-                                  
-                                  // Transacciones title
-                                  const Text(
-                                    'Transacciones',
-                                    style: TextStyle(
-                                      fontSize: 20,
+      stream: ref.child(user.uid.toString()).child('split').onValue,
+      builder: (context, AsyncSnapshot snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data.snapshot.value == null) {
+            return const NullErrorMessage(message: '¡Algo salió mal!');
+          } else {
+            Map<dynamic, dynamic> map = snapshot.data.snapshot.value;
+            return Scaffold(
+              body: SafeArea(
+                child: LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    return OrientationBuilder(
+                      builder: (BuildContext context, Orientation orientation) {
+                        return SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 15,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Balance card
+                                BalanceCard(
+                                  amount: map['savings'].toStringAsFixed(0),
+                                  constraints:
+                                      orientation == Orientation.portrait
+                                          ? constraints.maxHeight * 0.25
+                                          : constraints.maxHeight * 0.8,
+                                ),
+                                SizedBox(height: constraints.maxHeight * 0.03),
+
+                                // Cards for statistics
+                                // En la sección donde muestras las Cards for statistics
+
+                                // Cards for statistics
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CustomCard(
+                                      orientation: orientation,
+                                      verHeight: constraints.maxHeight * 0.15,
+                                      horiHeight: constraints.maxHeight * 0.5,
+                                      verWidth: constraints.maxHeight * 0.23,
+                                      horiWidth: constraints.maxWidth * 0.4,
+                                      cardTitle: 'Ingreso',
+                                      // Ahora el Ingreso es la suma del saldo disponible más lo gastado
+                                      cardBalance: ((map['savings'] ?? 0) +
+                                              (map['savingsSpendings'] ?? 0))
+                                          .toStringAsFixed(0),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: constraints.maxHeight * 0.03,
-                                  ),
-                                  
-                                  // Transactions list
-                                  map['savingsTransactions'] == null
-                                      ? const Center(
-                                          child: Text('Sin transacciones'),
-                                        )
-                                      : StreamBuilder(
-                                          stream: ref
+                                    CustomCard(
+                                      orientation: orientation,
+                                      verHeight: constraints.maxHeight * 0.15,
+                                      horiHeight: constraints.maxHeight * 0.5,
+                                      verWidth: constraints.maxHeight * 0.23,
+                                      horiWidth: constraints.maxWidth * 0.4,
+                                      cardTitle: 'Gastos',
+                                      cardBalance:
+                                          map['savingsSpendings'] == null
+                                              ? '0'
+                                              : map['savingsSpendings']
+                                                  .toStringAsFixed(0),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: constraints.maxHeight * 0.04),
+
+                                // Botón para agregar nuevo ahorro
+                                TButton(
+                                  constraints: constraints,
+                                  btnColor: Theme.of(context).primaryColor,
+                                  btnText: '+ Gastar',
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                const AddSavingsPayer(),
+                                      ),
+                                    );
+                                  },
+                                ),
+
+                                // Transacciones title
+                                const Text(
+                                  'Transacciones',
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                                SizedBox(height: constraints.maxHeight * 0.03),
+
+                                // Transactions list
+                                map['savingsTransactions'] == null
+                                    ? const Center(
+                                      child: Text('Sin transacciones'),
+                                    )
+                                    : StreamBuilder(
+                                      stream:
+                                          ref
                                               .child(user.uid)
                                               .child('split')
                                               .child('savingsTransactions')
                                               .onValue,
-                                          builder: (context,
-                                              AsyncSnapshot<DatabaseEvent>
-                                                  snapshot) {
-                                            if (!snapshot.hasData) {
-                                              return const Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                color: kGreenColor,
-                                              ));
-                                            } else {
-                                              Map<dynamic, dynamic> map =
-                                                  snapshot.data!.snapshot.value as dynamic;
-                                              List<dynamic> list = [];
-                                              list.clear();
-                                              list = map.values.toList();
-                                              list.sort((a, b) => b[
-                                                      'paymentDateTime']
-                                                  .compareTo(
-                                                      a['paymentDateTime']));
+                                      builder: (
+                                        context,
+                                        AsyncSnapshot<DatabaseEvent> snapshot,
+                                      ) {
+                                        if (!snapshot.hasData) {
+                                          return const Center(
+                                            child: CircularProgressIndicator(
+                                              color: kGreenColor,
+                                            ),
+                                          );
+                                        } else {
+                                          Map<dynamic, dynamic> map =
+                                              snapshot.data!.snapshot.value
+                                                  as dynamic;
+                                          List<dynamic> list = [];
+                                          list.clear();
+                                          list = map.values.toList();
+                                          list.sort(
+                                            (a, b) =>
+                                                b['paymentDateTime'].compareTo(
+                                                  a['paymentDateTime'],
+                                                ),
+                                          );
 
-                                              dynamic formatDate(String date) {
-                                                // Inicializar la configuración regional de español (Perú)
-                                                initializeDateFormatting(
+                                          dynamic formatDate(String date) {
+                                            // Inicializar la configuración regional de español (Perú)
+                                            initializeDateFormatting(
+                                              'es_PE',
+                                              null,
+                                            );
+
+                                            // Convertir el string a DateTime
+                                            final newDate = DateTime.parse(
+                                              date,
+                                            );
+
+                                            // Formatear la fecha con el formato deseado
+                                            final DateFormat formatter =
+                                                DateFormat(
+                                                  'E, d MMMM, hh:mm a',
                                                   'es_PE',
-                                                  null,
                                                 );
+                                            final formatted = formatter.format(
+                                              newDate,
+                                            );
 
-                                                // Convertir el string a DateTime
-                                                final newDate = DateTime.parse(
-                                                  date,
-                                                );
+                                            return formatted; // Retorna la fecha formateada
+                                          }
 
-                                                // Formatear la fecha con el formato deseado
-                                                final DateFormat formatter =
-                                                    DateFormat(
-                                                      'E, d MMMM, hh:mm a',
-                                                      'es_PE',
-                                                    );
-                                                final formatted = formatter
-                                                    .format(newDate);
-
-                                                return formatted; // Retorna la fecha formateada
-                                              }
-
-                                              return Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: SizedBox(
-                                                      height: orientation ==
+                                          return Row(
+                                            children: [
+                                              Expanded(
+                                                child: SizedBox(
+                                                  height:
+                                                      orientation ==
                                                               Orientation
                                                                   .portrait
                                                           ? constraints
@@ -191,60 +195,59 @@ class _SavingsScreenState extends State<SavingsScreen> {
                                                           : constraints
                                                                   .maxHeight *
                                                               0.5,
-                                                      child: ListView.builder(
-                                                        itemCount: snapshot
+                                                  child: ListView.builder(
+                                                    itemCount:
+                                                        snapshot
                                                             .data!
                                                             .snapshot
                                                             .children
                                                             .length,
-                                                        itemBuilder:
-                                                            ((context, index) {
-                                                          return TransactionCard(
-                                                            dateAndTime:
-                                                                formatDate(list[
-                                                                        index][
-                                                                    'paymentDateTime']),
-                                                            transactionAmount:
-                                                                '${list[index]['amount']}',
-                                                            transactionName:
-                                                                list[index]
-                                                                    ['name'],
-                                                            width: constraints
-                                                                    .maxWidth *
-                                                                0.05,
-                                                            constraints:
-                                                                constraints,
-                                                          );
-                                                        }),
-                                                      ),
-                                                    ),
+                                                    itemBuilder: ((
+                                                      context,
+                                                      index,
+                                                    ) {
+                                                      return TransactionCard(
+                                                        dateAndTime: formatDate(
+                                                          list[index]['paymentDateTime'],
+                                                        ),
+                                                        transactionAmount:
+                                                            '${list[index]['amount']}',
+                                                        transactionName:
+                                                            list[index]['name'],
+                                                        width:
+                                                            constraints
+                                                                .maxWidth *
+                                                            0.05,
+                                                        constraints:
+                                                            constraints,
+                                                      );
+                                                    }),
                                                   ),
-                                                ],
-                                              );
-                                            }
-                                          },
-                                        ),
-                                  SizedBox(
-                                    height: constraints.maxHeight * 0.04,
-                                  ),
-                                ],
-                              ),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        }
+                                      },
+                                    ),
+                                SizedBox(height: constraints.maxHeight * 0.04),
+                              ],
                             ),
-                          );
-                        },
-                      );
-                    },
-                  ),
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
-              );
-            }
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: kGreenColor,
               ),
             );
           }
-        });
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(color: kGreenColor),
+          );
+        }
+      },
+    );
   }
 }
