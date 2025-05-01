@@ -97,20 +97,50 @@ class _SavingsScreenState extends State<SavingsScreen> {
                                 SizedBox(height: constraints.maxHeight * 0.04),
 
                                 // Botón para agregar nuevo ahorro
-                                TButton(
-                                  constraints: constraints,
-                                  btnColor: Theme.of(context).primaryColor,
-                                  btnText: '+ Gastar',
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) =>
-                                                const AddSavingsPayer(),
+                                // Reemplaza el TButton actual con un SizedBox + ElevatedButton
+                                SizedBox(
+                                  width: double.infinity, // Ocupa todo el ancho
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          kGreenColor, // Color primario verde
+                                      foregroundColor:
+                                          Colors.white, // Texto blanco
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 15,
+                                      ), // Padding vertical para hacerlo más alto
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          12,
+                                        ), // Bordes redondeados
                                       ),
-                                    );
-                                  },
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) =>
+                                                  const AddSavingsPayer(),
+                                        ),
+                                      );
+                                    },
+                                    child: const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.currency_exchange, size: 24),
+                                        SizedBox(width: 12),
+                                        Text(
+                                          'Invertir',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
 
                                 CustomCard(

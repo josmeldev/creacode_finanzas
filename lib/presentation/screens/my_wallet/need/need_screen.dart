@@ -28,212 +28,239 @@ class _NeedScreenState extends State<NeedScreen> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: ref.child(user.uid.toString()).child('split').onValue,
-        builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData) {
-            if (snapshot.data.snapshot.value == null) {
-              return const NullErrorMessage(
-                message: '¡Algo salió mal!',
-              );
-            } else {
-              Map<dynamic, dynamic> map = snapshot.data.snapshot.value;
-              return Scaffold(
-                body: SafeArea(
-                  child: LayoutBuilder(
-                    builder:
-                        (BuildContext context, BoxConstraints constraints) {
-                      return OrientationBuilder(
-                        builder:
-                            (BuildContext context, Orientation orientation) {
-                          return SingleChildScrollView(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 15),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  BalanceCard(
-                                    amount: map['needAvailableBalance']
-                                        .toStringAsFixed(0),
-                                    constraints:
-                                        orientation == Orientation.portrait
-                                            ? constraints.maxHeight * 0.25
-                                            : constraints.maxHeight * 0.8,
-                                  ),
-                                  SizedBox(
-                                    height: constraints.maxHeight * 0.03,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      CustomCard(
-                                        orientation: orientation,
-                                        verHeight: constraints.maxHeight * 0.15,
-                                        horiHeight: constraints.maxHeight * 0.5,
-                                        verWidth: constraints.maxHeight * 0.23,
-                                        horiWidth: constraints.maxWidth * 0.4,
-                                        cardTitle: 'Ingreso',
-                                        cardBalance:
-                                            map['need'].toStringAsFixed(0),
+      stream: ref.child(user.uid.toString()).child('split').onValue,
+      builder: (context, AsyncSnapshot snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data.snapshot.value == null) {
+            return const NullErrorMessage(message: '¡Algo salió mal!');
+          } else {
+            Map<dynamic, dynamic> map = snapshot.data.snapshot.value;
+            return Scaffold(
+              body: SafeArea(
+                child: LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    return OrientationBuilder(
+                      builder: (BuildContext context, Orientation orientation) {
+                        return SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 15,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                BalanceCard(
+                                  amount: map['needAvailableBalance']
+                                      .toStringAsFixed(0),
+                                  constraints:
+                                      orientation == Orientation.portrait
+                                          ? constraints.maxHeight * 0.25
+                                          : constraints.maxHeight * 0.8,
+                                ),
+                                SizedBox(height: constraints.maxHeight * 0.03),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CustomCard(
+                                      orientation: orientation,
+                                      verHeight: constraints.maxHeight * 0.15,
+                                      horiHeight: constraints.maxHeight * 0.5,
+                                      verWidth: constraints.maxHeight * 0.23,
+                                      horiWidth: constraints.maxWidth * 0.4,
+                                      cardTitle: 'Ingreso',
+                                      cardBalance: map['need'].toStringAsFixed(
+                                        0,
                                       ),
-                                      const SizedBox(
-                                        width: 20,
+                                    ),
+                                    const SizedBox(width: 20),
+                                    CustomCard(
+                                      orientation: orientation,
+                                      verHeight: constraints.maxHeight * 0.15,
+                                      horiHeight: constraints.maxHeight * 0.5,
+                                      verWidth: constraints.maxHeight * 0.23,
+                                      horiWidth: constraints.maxWidth * 0.45,
+                                      cardTitle: 'Gastos',
+                                      cardBalance:
+                                          map['needSpendings'] == null
+                                              ? 0.toString()
+                                              : map['needSpendings']
+                                                  .toStringAsFixed(0),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: constraints.maxHeight * 0.03),
+                                // Reemplaza el TButton por un SizedBox + ElevatedButton
+                                SizedBox(
+                                  width: double.infinity, // Ocupa todo el ancho
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          kGreenColor, // Color primario verde
+                                      foregroundColor:
+                                          Colors.white, // Texto blanco
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 15,
+                                      ), // Padding vertical para hacerlo más alto
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          12,
+                                        ), // Bordes redondeados
                                       ),
-                                      CustomCard(
-                                        orientation: orientation,
-                                        verHeight: constraints.maxHeight * 0.15,
-                                        horiHeight: constraints.maxHeight * 0.5,
-                                        verWidth: constraints.maxHeight * 0.23,
-                                        horiWidth: constraints.maxWidth * 0.45,
-                                        cardTitle: 'Gastos',
-                                        cardBalance:
-                                            map['needSpendings'] == null
-                                                ? 0.toString()
-                                                : map['needSpendings']
-                                                    .toStringAsFixed(0),
-                                      ),
-                                    ],
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => const AddNeedPayer(),
+                                        ),
+                                      );
+                                    },
+                                    child: const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.payment, size: 24),
+                                        SizedBox(width: 12),
+                                        Text(
+                                          'Pagar necesidades',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  SizedBox(
-                                    height: constraints.maxHeight * 0.03,
-                                  ),
-                                  TButton(
-                                      constraints: constraints,
-                                      btnColor: Theme.of(context).primaryColor,
-                                      btnText: '+ Nuevo Pago',
-                                  
-                                      onPressed: () {
+                                ),
+                                SizedBox(height: constraints.maxHeight * 0.03),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  // crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
                                         Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const AddNeedPayer()));
-                                      }),
-                                  SizedBox(
-                                    height: constraints.maxHeight * 0.03,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    // crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const AutopayScreen()));
-                                        },
-                                        child: CardAlt(
-                                          orientation: orientation,
-                                          constraints: constraints,
-                                          iconName: Icons.schedule,
-                                          title: 'AutoPago',
-                                          verHeight:
-                                              constraints.maxHeight * 0.15,
-                                          horiHeight:
-                                              constraints.maxHeight * 0.5,
-                                          verWidth:
-                                              constraints.maxHeight * 0.22,
-                                          horiWidth: constraints.maxWidth * 0.4,
-                                        ),
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) =>
+                                                    const AutopayScreen(),
+                                          ),
+                                        );
+                                      },
+                                      child: CardAlt(
+                                        orientation: orientation,
+                                        constraints: constraints,
+                                        iconName: Icons.schedule,
+                                        title: 'AutoPago',
+                                        verHeight: constraints.maxHeight * 0.15,
+                                        horiHeight: constraints.maxHeight * 0.5,
+                                        verWidth: constraints.maxHeight * 0.22,
+                                        horiWidth: constraints.maxWidth * 0.4,
                                       ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const PayersScreen()));
-                                        },
-                                        child: CardAlt(
-                                          orientation: orientation,
-                                          constraints: constraints,
-                                          iconName: Icons.groups,
-                                          title: 'Pagos',
-                                          verHeight:
-                                              constraints.maxHeight * 0.15,
-                                          horiHeight:
-                                              constraints.maxHeight * 0.5,
-                                          verWidth:
-                                              constraints.maxHeight * 0.22,
-                                          horiWidth: constraints.maxWidth * 0.4,
-                                        ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) =>
+                                                    const PayersScreen(),
+                                          ),
+                                        );
+                                      },
+                                      child: CardAlt(
+                                        orientation: orientation,
+                                        constraints: constraints,
+                                        iconName: Icons.groups,
+                                        title: 'Pagos',
+                                        verHeight: constraints.maxHeight * 0.15,
+                                        horiHeight: constraints.maxHeight * 0.5,
+                                        verWidth: constraints.maxHeight * 0.22,
+                                        horiWidth: constraints.maxWidth * 0.4,
                                       ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: constraints.maxHeight * 0.03,
-                                  ),
-                                  const Text(
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: constraints.maxHeight * 0.03),
+                                const Text(
                                   'Necesita transacciones',
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                  SizedBox(
-                                    height: constraints.maxHeight * 0.03,
-                                  ),
-                                  map['needTransactions'] == null
-                                      ? const Center(
-                                          child:
-                                              Text('No hay transacciones disponibles'))
-                                      : StreamBuilder(
-                                          stream: ref
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                                SizedBox(height: constraints.maxHeight * 0.03),
+                                map['needTransactions'] == null
+                                    ? const Center(
+                                      child: Text(
+                                        'No hay transacciones disponibles',
+                                      ),
+                                    )
+                                    : StreamBuilder(
+                                      stream:
+                                          ref
                                               .child(user.uid)
                                               .child('split')
                                               .child('needTransactions')
                                               .onValue,
-                                          builder: (context,
-                                              AsyncSnapshot<DatabaseEvent>
-                                                  snapshot) {
-                                            if (!snapshot.hasData) {
-                                              return const Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                color: kGreenColor,
-                                              ));
-                                            } else {
-                                              Map<dynamic, dynamic> map =
-                                                  snapshot.data!.snapshot.value
-                                                      as dynamic;
-                                              List<dynamic> list = [];
-                                              list.clear();
-                                              list = map.values.toList();
-                                              list.sort((a, b) => b[
-                                                      'paymentDateTime']
-                                                  .compareTo(
-                                                      a['paymentDateTime']));
+                                      builder: (
+                                        context,
+                                        AsyncSnapshot<DatabaseEvent> snapshot,
+                                      ) {
+                                        if (!snapshot.hasData) {
+                                          return const Center(
+                                            child: CircularProgressIndicator(
+                                              color: kGreenColor,
+                                            ),
+                                          );
+                                        } else {
+                                          Map<dynamic, dynamic> map =
+                                              snapshot.data!.snapshot.value
+                                                  as dynamic;
+                                          List<dynamic> list = [];
+                                          list.clear();
+                                          list = map.values.toList();
+                                          list.sort(
+                                            (a, b) =>
+                                                b['paymentDateTime'].compareTo(
+                                                  a['paymentDateTime'],
+                                                ),
+                                          );
 
-                                              dynamic formatDate(String date) {
-                                                // Inicializar la configuración regional de español (Perú)
-                                                initializeDateFormatting(
+                                          dynamic formatDate(String date) {
+                                            // Inicializar la configuración regional de español (Perú)
+                                            initializeDateFormatting(
+                                              'es_PE',
+                                              null,
+                                            );
+
+                                            // Convertir el string a DateTime
+                                            final newDate = DateTime.parse(
+                                              date,
+                                            );
+
+                                            // Formatear la fecha con el formato deseado
+                                            final DateFormat formatter =
+                                                DateFormat(
+                                                  'E, d MMMM, hh:mm a',
                                                   'es_PE',
-                                                  null,
                                                 );
+                                            final formatted = formatter.format(
+                                              newDate,
+                                            );
 
-                                                // Convertir el string a DateTime
-                                                final newDate = DateTime.parse(
-                                                  date,
-                                                );
+                                            return formatted; // Retorna la fecha formateada
+                                          }
 
-                                                // Formatear la fecha con el formato deseado
-                                                final DateFormat formatter =
-                                                    DateFormat(
-                                                      'E, d MMMM, hh:mm a',
-                                                      'es_PE',
-                                                    );
-                                                final formatted = formatter
-                                                    .format(newDate);
-
-                                                return formatted; // Retorna la fecha formateada
-                                              }
-
-                                              return Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: SizedBox(
-                                                      height: orientation ==
+                                          return Row(
+                                            children: [
+                                              Expanded(
+                                                child: SizedBox(
+                                                  height:
+                                                      orientation ==
                                                               Orientation
                                                                   .portrait
                                                           ? constraints
@@ -242,60 +269,59 @@ class _NeedScreenState extends State<NeedScreen> {
                                                           : constraints
                                                                   .maxHeight *
                                                               0.7,
-                                                      child: ListView.builder(
-                                                          itemCount: snapshot
-                                                              .data!
-                                                              .snapshot
-                                                              .children
-                                                              .length,
-                                                          itemBuilder:
-                                                              ((context,
-                                                                  index) {
-                                                            return TransactionCard(
-                                                                constraints:
-                                                                    constraints,
-                                                                dateAndTime:
-                                                                    formatDate(list[
-                                                                            index]
-                                                                        [
-                                                                        'paymentDateTime']),
-                                                                transactionAmount:
-                                                                    '- ${list[index]['amount'].toStringAsFixed(0)}',
-                                                                transactionName:
-                                                                    list[index][
-                                                                        'name'],
-                                                                width: constraints
-                                                                        .maxWidth *
-                                                                    0.05);
-                                                          })),
-                                                    ),
+                                                  child: ListView.builder(
+                                                    itemCount:
+                                                        snapshot
+                                                            .data!
+                                                            .snapshot
+                                                            .children
+                                                            .length,
+                                                    itemBuilder: ((
+                                                      context,
+                                                      index,
+                                                    ) {
+                                                      return TransactionCard(
+                                                        constraints:
+                                                            constraints,
+                                                        dateAndTime: formatDate(
+                                                          list[index]['paymentDateTime'],
+                                                        ),
+                                                        transactionAmount:
+                                                            '- ${list[index]['amount'].toStringAsFixed(0)}',
+                                                        transactionName:
+                                                            list[index]['name'],
+                                                        width:
+                                                            constraints
+                                                                .maxWidth *
+                                                            0.05,
+                                                      );
+                                                    }),
                                                   ),
-                                                ],
-                                              );
-                                            }
-                                          },
-                                        ),
-                                  SizedBox(
-                                    height: constraints.maxHeight * 0.04,
-                                  ),
-                                ],
-                              ),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        }
+                                      },
+                                    ),
+                                SizedBox(height: constraints.maxHeight * 0.04),
+                              ],
                             ),
-                          );
-                        },
-                      );
-                    },
-                  ),
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
-              );
-            }
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: kGreenColor,
               ),
             );
           }
-        });
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(color: kGreenColor),
+          );
+        }
+      },
+    );
   }
 }
