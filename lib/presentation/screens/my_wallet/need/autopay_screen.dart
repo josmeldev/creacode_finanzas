@@ -55,7 +55,7 @@ class _AutopayScreenState extends State<AutopayScreen> {
                                       width: constraints.maxWidth * 0.03,
                                     ),
                                     const Text(
-                                      'Transacciones automáticas',
+                                      'Pagos programados',
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
                                           fontSize: 24,
@@ -69,7 +69,7 @@ class _AutopayScreenState extends State<AutopayScreen> {
                                 map['needAutopay'] == null
                                     ? const Center(
                                         child:
-                                            Text('No transactions available'))
+                                            Text('No hay transacciones disponibles'))
                                     : StreamBuilder(
                                         stream: ref
                                             .child(user.uid)

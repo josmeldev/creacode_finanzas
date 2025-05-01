@@ -120,7 +120,7 @@ class _AddNeedPayerState extends State<AddNeedPayer> {
 // Validator for name
   String? _validateFormField(String? value) {
     if (value == null || value.isEmpty) {
-      return 'This field is required';
+      return 'Este campo es obligatorio';
     }
     return null;
   }
@@ -128,14 +128,14 @@ class _AddNeedPayerState extends State<AddNeedPayer> {
 // Validator for numeber realted textfields
   String? _validateNumber(String? value) {
     if (value == null || value.isEmpty) {
-      return 'This field is required';
+      return 'Este campo es obligatorio';
     }
     final double? amount = double.tryParse(value);
     if (amount == null) {
-      return 'Please enter a valid amount';
+      return 'Por favor, introduzca un importe válido';
     }
     if (amount <= 0) {
-      return 'Amount must be greater than 0';
+      return 'El importe debe ser mayor que 0';
     }
     return null;
   }
@@ -152,7 +152,7 @@ class _AddNeedPayerState extends State<AddNeedPayer> {
         var currentNeedAvailable = (snapshot.value) as dynamic;
 
         if (double.parse(amountController.text) > currentNeedAvailable) {
-          ToastMessage().toastMessage('Insufficient Balance', Colors.red);
+          ToastMessage().toastMessage('Saldo insuficiente', Colors.red);
         } else {
           // Check if payer already exists
           DataSnapshot payerSnapshot = await needIncomeRef
@@ -189,7 +189,7 @@ class _AddNeedPayerState extends State<AddNeedPayer> {
               .set(payerData)
               .then((value) async {
             Navigator.of(context).pop();
-            ToastMessage().toastMessage('Added to autopay!', Colors.green);
+            ToastMessage().toastMessage('Añadido a Autopago!', Colors.green);
 
             // Starting autopay method by creating an instance
             Autopay instance = Autopay();
@@ -199,7 +199,7 @@ class _AddNeedPayerState extends State<AddNeedPayer> {
           });
         }
       } else {
-        ToastMessage().toastMessage('Please select Date and Time', Colors.red);
+        ToastMessage().toastMessage('Por favor seleccione fecha y hora', Colors.red);
       }
     }
   }
@@ -276,7 +276,7 @@ class _AddNeedPayerState extends State<AddNeedPayer> {
             .set(allTransactionPayer);
 
         Navigator.pop(context);
-        ToastMessage().toastMessage('Success!', Colors.green);
+        ToastMessage().toastMessage('Exitoso!', Colors.green);
       }
     }
   }
@@ -311,7 +311,7 @@ class _AddNeedPayerState extends State<AddNeedPayer> {
                                 width: constraints.maxWidth * 0.03,
                               ),
                               const Text(
-                                'Add Payer',
+                                'Añadir Pago',
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     fontSize: 28, fontWeight: FontWeight.w400),
@@ -322,7 +322,7 @@ class _AddNeedPayerState extends State<AddNeedPayer> {
                             height: constraints.maxHeight * 0.03,
                           ),
                           CustomTextField(
-                            hint: 'Full name',
+                            hint: 'Producto o servicio',
                             iconName: Icons.person,
                             controller: nameController,
                             keyboardType: TextInputType.text,
@@ -332,7 +332,7 @@ class _AddNeedPayerState extends State<AddNeedPayer> {
                             height: constraints.maxHeight * 0.02,
                           ),
                           CustomTextField(
-                              hint: 'Amount',
+                              hint: 'Monto',
                               iconName: Icons.attach_money,
                               controller: amountController,
                               keyboardType: TextInputType.number,
@@ -344,7 +344,7 @@ class _AddNeedPayerState extends State<AddNeedPayer> {
                             height: constraints.maxHeight * 0.02,
                           ),
                           CustomTextField(
-                              hint: 'Account number',
+                              hint: 'Numero de cuenta',
                               iconName: Icons.account_balance,
                               controller: accountNumberController,
                               keyboardType: TextInputType.number,
@@ -356,7 +356,7 @@ class _AddNeedPayerState extends State<AddNeedPayer> {
                             height: constraints.maxHeight * 0.02,
                           ),
                           CustomTextField(
-                              hint: 'Phone number',
+                              hint: 'Numero de teléfono',
                               iconName: Icons.call,
                               controller: phoneNumberController,
                               keyboardType: TextInputType.phone,
@@ -368,7 +368,7 @@ class _AddNeedPayerState extends State<AddNeedPayer> {
                             height: constraints.maxHeight * 0.02,
                           ),
                           CustomTextField(
-                            hint: 'Short description',
+                            hint: 'Pequeña descripción',
                             iconName: Icons.subject,
                             validator: null,
                             controller: shortDescriptionController,
@@ -380,7 +380,7 @@ class _AddNeedPayerState extends State<AddNeedPayer> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
-                                'Autopay',
+                                'Autopago',
                                 style: TextStyle(
                                   fontSize: 18,
                                 ),
@@ -433,7 +433,7 @@ class _AddNeedPayerState extends State<AddNeedPayer> {
                           TButton(
                               constraints: constraints,
                               btnColor: Theme.of(context).primaryColor,
-                              btnText: 'Add Autopay',
+                              btnText: 'Añadir a autopago',
                               onPressed: _addAutopay),
                           SizedBox(
                             height: constraints.maxHeight * 0.04,
@@ -441,7 +441,7 @@ class _AddNeedPayerState extends State<AddNeedPayer> {
                           TButton(
                               constraints: constraints,
                               btnColor: Theme.of(context).primaryColor,
-                              btnText: 'Add & Pay',
+                              btnText: 'Añadir y pagar',
                               onPressed: _addAndPay),
                           SizedBox(
                             height: constraints.maxHeight * 0.04,

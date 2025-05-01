@@ -167,7 +167,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                     map['expensesTransactions'] == null
                                         ? const Center(
                                             child: Text(
-                                                'No transactions available'),
+                                                'No hay transacciones disponibles'),
                                           )
                                         : StreamBuilder(
                                             stream: ref

@@ -152,7 +152,7 @@ class _NeedScreenState extends State<NeedScreen> {
                                           orientation: orientation,
                                           constraints: constraints,
                                           iconName: Icons.groups,
-                                          title: 'Usuarios',
+                                          title: 'Pagos',
                                           verHeight:
                                               constraints.maxHeight * 0.15,
                                           horiHeight:

@@ -142,7 +142,7 @@ class _EmergencyPlanningScreenState extends State<EmergencyPlanningScreen> {
                                 width: constraints.maxWidth * 0.03,
                               ),
                               const Text(
-                                'Emergency funds plan',
+                                'Fondos de emergencia',
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     fontSize: 28, fontWeight: FontWeight.w400),
@@ -153,7 +153,7 @@ class _EmergencyPlanningScreenState extends State<EmergencyPlanningScreen> {
                             height: constraints.maxHeight * 0.02,
                           ),
                           const Text(
-                            'Emergency funds are taken from need category funds at start of every month. By default emergency funds are 6 times of expenses category funds, but you can change it according to your plan',
+                            'Los fondos de emergencia se descuentan de los fondos de la categoría de necesidad al inicio de cada mes. Por defecto, los fondos de emergencia equivalen a seis veces los fondos de la categoría de gastos, pero puede modificarlos según su plan.',
                             style: TextStyle(color: kGrayTextC, fontSize: 16),
                             textAlign: TextAlign.start,
                           ),
@@ -161,7 +161,7 @@ class _EmergencyPlanningScreenState extends State<EmergencyPlanningScreen> {
                             height: constraints.maxHeight * 0.04,
                           ),
                           const Text(
-                            'Enter multiple of expenses',
+                            'Ingrese múltiplos de gastos',
                             style: TextStyle(
                               fontSize: 18,
                             ),
@@ -182,7 +182,7 @@ class _EmergencyPlanningScreenState extends State<EmergencyPlanningScreen> {
                             height: constraints.maxHeight * 0.04,
                           ),
                           const Text(
-                            'Enter the EMI amount',
+                            'Ingrese el monto de la EMI',
                             style: TextStyle(
                               fontSize: 18,
                             ),

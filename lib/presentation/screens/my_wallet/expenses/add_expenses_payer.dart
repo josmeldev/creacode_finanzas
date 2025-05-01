@@ -32,21 +32,21 @@ class _AddExpensesPayerState extends State<AddExpensesPayer> {
 // Validators for form fields
   String? _validateFormField(String? value) {
     if (value == null || value.isEmpty) {
-      return 'This field is required';
+      return 'Este campo es obligatorio';
     }
     return null;
   }
 
   String? _validateNumber(String? value) {
     if (value == null || value.isEmpty) {
-      return 'This field is required';
+      return 'Este campo es obligatorio';
     }
     final double? amount = double.tryParse(value);
     if (amount == null) {
-      return 'Please enter a valid amount';
+      return 'Este campo debe ser un número';
     }
     if (amount <= 0) {
-      return 'Amount must be greater than 0';
+      return 'El monto debe ser mayor que 0';
     }
     return null;
   }
@@ -153,7 +153,7 @@ class _AddExpensesPayerState extends State<AddExpensesPayer> {
                                 width: constraints.maxWidth * 0.03,
                               ),
                               const Text(
-                                'Pago de cuenta',
+                                'Paga tu deseo',
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     fontSize: 28, fontWeight: FontWeight.w400),

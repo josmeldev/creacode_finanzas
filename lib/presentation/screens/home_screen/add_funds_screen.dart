@@ -177,13 +177,13 @@ class _AddFundsScreenState extends State<AddFundsScreen> {
                           ),
                           SizedBox(height: constraints.maxHeight * 0.02),
                           const Text(
-                            'Enter amount',
+                            'Ingresa la cantidad',
                             style: TextStyle(fontSize: 18),
                             textAlign: TextAlign.start,
                           ),
                           SizedBox(height: constraints.maxHeight * 0.02),
                           CustomTextField(
-                              hint: 'Amount',
+                              hint: 'Cantidad',
                               iconName: Icons.attach_money,
                               controller: amountController,
                               validator: checkValid,
@@ -193,7 +193,7 @@ class _AddFundsScreenState extends State<AddFundsScreen> {
                               ]),
                           SizedBox(height: constraints.maxHeight * 0.02),
                           const Text(
-                            'Enter the percentage split for Needs',
+                            'Introduzca el porcentaje de división para las necesidades',
                             style: TextStyle(fontSize: 18),
                             textAlign: TextAlign.start,
                           ),
@@ -209,7 +209,7 @@ class _AddFundsScreenState extends State<AddFundsScreen> {
                               ]),
                           SizedBox(height: constraints.maxHeight * 0.02),
                           const Text(
-                            'Enter the percentage split for Expenses',
+                            'Introduzca el porcentaje de división de los deseos',
                             style: TextStyle(fontSize: 18),
                             textAlign: TextAlign.start,
                           ),
@@ -225,7 +225,7 @@ class _AddFundsScreenState extends State<AddFundsScreen> {
                               ]),
                           SizedBox(height: constraints.maxHeight * 0.02),
                           const Text(
-                            'Enter the percentage split for Savings',
+                            'Introduzca el porcentaje de división para los ahorros',
                             style: TextStyle(fontSize: 18),
                             textAlign: TextAlign.start,
                           ),
@@ -241,7 +241,7 @@ class _AddFundsScreenState extends State<AddFundsScreen> {
                               ]),
                           SizedBox(height: constraints.maxHeight * 0.02),
                           const Text(
-                            'If the split percentage for Needs, Expenses and Savings are not given it will be taken as 50%, 30% and 20% respectively.',
+                            'Si no se indica el porcentaje de división para Necesidades, Gastos y Ahorros, se tomará el 50%, 30% y 20% respectivamente.',
                             style: TextStyle(color: kGrayTextC, fontSize: 14),
                             textAlign: TextAlign.start,
                           ),
@@ -249,7 +249,7 @@ class _AddFundsScreenState extends State<AddFundsScreen> {
                           TButton(
                               constraints: constraints,
                               btnColor: Theme.of(context).primaryColor,
-                              btnText: 'Add',
+                              btnText: 'Añadir fondos',
                               onPressed: () async {
                                 add();
                               }),

@@ -105,28 +105,35 @@ class _NeedPayersPayScreenState extends State<NeedPayersPayScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Pay Now',
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                              fontSize: 28, fontWeight: FontWeight.w400),
-                        ),
+                        Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                icon: const Icon(Icons.keyboard_backspace),
+                              ),
+                              SizedBox(
+                                width: constraints.maxWidth * 0.03,
+                              ),
+                              const Text(
+                                'Seguir pagando',
+                                textAlign: TextAlign.start,
+                                style: TextStyle(
+                                    fontSize: 28, fontWeight: FontWeight.w400),
+                              ),
+                            ],
+                          ),
+                        
                         SizedBox(
                           height: constraints.maxHeight * 0.02,
                         ),
-                        const Center(
-                          child: Text(
-                            'Payment Details',
-                            style: TextStyle(
-                              fontSize: 20,
-                            ),
-                          ),
-                        ),
+                        
                         SizedBox(
                           height: constraints.maxHeight * 0.04,
                         ),
                         const Text(
-                          'Payer Name',
+                          'Nombre del beneficiario',
                           style: TextStyle(fontSize: 22, color: kGreenColor),
                         ),
                         Text(
@@ -139,7 +146,7 @@ class _NeedPayersPayScreenState extends State<NeedPayersPayScreen> {
                           height: constraints.maxHeight * 0.02,
                         ),
                         const Text(
-                          'Account Number',
+                          'Numero de cuenta',
                           style: TextStyle(fontSize: 22, color: kGreenColor),
                         ),
                         Text(
@@ -152,7 +159,7 @@ class _NeedPayersPayScreenState extends State<NeedPayersPayScreen> {
                           height: constraints.maxHeight * 0.02,
                         ),
                         const Text(
-                          'Amount',
+                          'Monto a pagar',
                           style: TextStyle(fontSize: 22, color: kGreenColor),
                         ),
                         SizedBox(
@@ -161,7 +168,7 @@ class _NeedPayersPayScreenState extends State<NeedPayersPayScreen> {
                         Form(
                           key: _formKey,
                           child: CustomTextField(
-                              hint: 'Enter amount to pay',
+                              hint: 'Introduzca el monto a pagar',
                               iconName: Icons.attach_money,
                               controller: amountController,
                               validator: checkValidPercentage,
@@ -174,14 +181,14 @@ class _NeedPayersPayScreenState extends State<NeedPayersPayScreen> {
                           height: constraints.maxHeight * 0.02,
                         ),
                         const Text(
-                          'Short description',
+                          'Descripcion corta',
                           style: TextStyle(fontSize: 22, color: kGreenColor),
                         ),
                         SizedBox(
                           height: constraints.maxHeight * 0.02,
                         ),
                         CustomTextField(
-                          hint: 'Short description',
+                          hint: 'Introduzca una breve descripcion',
                           iconName: Icons.subject,
                           controller: shortDescriptionController,
                           validator: checkValidPercentage,
@@ -192,7 +199,7 @@ class _NeedPayersPayScreenState extends State<NeedPayersPayScreen> {
                         TButton(
                             constraints: constraints,
                             btnColor: Theme.of(context).primaryColor,
-                            btnText: 'Pay Now',
+                            btnText: 'Pagar',
                             onPressed: _addAndPay)
                       ],
                     ),
