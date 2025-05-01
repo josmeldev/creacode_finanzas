@@ -63,6 +63,7 @@ void clearUserSplitData() async {
                   'totalBalance': 0,
                   'needAvailableBalance': 0,
                   'expensesAvailableBalance': 0,
+                  
                   'count': 1,
                   'isEFenabled': false,
                   'isCPenabled': false,

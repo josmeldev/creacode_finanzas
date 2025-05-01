@@ -1,15 +1,17 @@
 import 'package:creacode_finanzas/colors.dart';
-import 'package:creacode_finanzas/presentation/screens/my_wallet/savings/automatic_investment_screen.dart';
-import 'package:creacode_finanzas/presentation/screens/my_wallet/savings/manual_investment_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import '../../../widgets/balance_card.dart';
 import '../../../widgets/null_error_message_widget.dart';
 import '../../../widgets/transaction_card.dart';
-import 'package:intl/intl.dart';
+import '../../../widgets/card_alt.dart';
+import '../../../widgets/custom_card.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import '../../../widgets/transaction_card.dart';
+import '../savings/add_savings_payer.dart';
+import '../../../widgets/button.dart'; // Asegúrate de que este import esté presente
 
 class SavingsScreen extends StatefulWidget {
   const SavingsScreen({super.key});
@@ -49,6 +51,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  // Balance card
                                   BalanceCard(
                                     amount: map['savings'].toStringAsFixed(0),
                                     constraints:
@@ -59,88 +62,59 @@ class _SavingsScreenState extends State<SavingsScreen> {
                                   SizedBox(
                                     height: constraints.maxHeight * 0.03,
                                   ),
-                                  const Text(
-                                    'Invertir',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: constraints.maxHeight * 0.03,
-                                  ),
+                                  
+                                  // Cards for statistics
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const ManualInvestmentScreen()));
-                                        },
-                                        child: SavingsCard(
-                                          orientation: orientation,
-                                          constraints: constraints,
-                                          iconName: Icons.trending_up,
-                                          title: 'Inversión\n manual',
-                                          verHeight:
-                                              constraints.maxHeight * 0.2,
-                                          horiHeight:
-                                              constraints.maxHeight * 0.5,
-                                          verWidth: constraints.maxHeight * 0.2,
-                                          horiWidth: constraints.maxWidth * 0.4,
-                                        ),
+                                      CustomCard(
+                                        orientation: orientation,
+                                        verHeight: constraints.maxHeight * 0.15,
+                                        horiHeight: constraints.maxHeight * 0.5,
+                                        verWidth: constraints.maxHeight * 0.23,
+                                        horiWidth: constraints.maxWidth * 0.4,
+                                        cardTitle: 'Ingreso',
+                                        cardBalance: map['savings']
+                                            .toStringAsFixed(0),
                                       ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const AutoInvestmentScreen()));
-                                        },
-                                        child: Stack(
-                                          children: [
-                                            SavingsCard(
-                                              orientation: orientation,
-                                              constraints: constraints,
-                                              iconName: Icons.trending_up,
-                                              title: 'Inversión\n automática',
-                                              verHeight:
-                                                  constraints.maxHeight * 0.2,
-                                              horiHeight:
-                                                  constraints.maxHeight * 0.5,
-                                              verWidth:
-                                                  constraints.maxHeight * 0.2,
-                                              horiWidth:
-                                                  constraints.maxWidth * 0.4,
-                                            ),
-                                            Positioned(
-                                                left: orientation ==
-                                                        Orientation.portrait
-                                                    ? 42
-                                                    : 125,
-                                                top: orientation ==
-                                                        Orientation.portrait
-                                                    ? 20
-                                                    : 12,
-                                                child: const Icon(
-                                                  Icons.update,
-                                                  color: Colors.white,
-                                                  size: 22,
-                                                ))
-                                          ],
-                                        ),
+                                      CustomCard(
+                                        orientation: orientation,
+                                        verHeight: constraints.maxHeight * 0.15,
+                                        horiHeight: constraints.maxHeight * 0.5,
+                                        verWidth: constraints.maxHeight * 0.23,
+                                        horiWidth: constraints.maxWidth * 0.4,
+                                        cardTitle: 'Gastos',
+                                        cardBalance:
+                                            map['savingsSpendings'] == null
+                                                ? 0.toString()
+                                                : map['savingsSpendings']
+                                                    .toStringAsFixed(0),
                                       ),
                                     ],
                                   ),
                                   SizedBox(
-                                    height: constraints.maxHeight * 0.03,
+                                    height: constraints.maxHeight * 0.04,
                                   ),
+                                  
+                                  // Botón para agregar nuevo ahorro
+                                  TButton(
+                                    constraints: constraints,
+                                    btnColor: Theme.of(context).primaryColor,
+                                    btnText: '+ Gastar',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const AddSavingsPayer()
+                                        )
+                                      );
+                                    }
+                                  ),
+                                  
+                                  // Transacciones title
                                   const Text(
-                                    'Inversiones recientes',
+                                    'Transacciones',
                                     style: TextStyle(
                                       fontSize: 20,
                                     ),
@@ -148,15 +122,17 @@ class _SavingsScreenState extends State<SavingsScreen> {
                                   SizedBox(
                                     height: constraints.maxHeight * 0.03,
                                   ),
-                                  map['savingInvestments'] == null
+                                  
+                                  // Transactions list
+                                  map['savingsTransactions'] == null
                                       ? const Center(
-                                          child: Text('Sin inversiones'),
+                                          child: Text('Sin transacciones'),
                                         )
                                       : StreamBuilder(
                                           stream: ref
                                               .child(user.uid)
                                               .child('split')
-                                              .child('savingInvestments')
+                                              .child('savingsTransactions')
                                               .onValue,
                                           builder: (context,
                                               AsyncSnapshot<DatabaseEvent>
@@ -169,8 +145,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
                                               ));
                                             } else {
                                               Map<dynamic, dynamic> map =
-                                                  snapshot.data!.snapshot.value
-                                                      as dynamic;
+                                                  snapshot.data!.snapshot.value as dynamic;
                                               List<dynamic> list = [];
                                               list.clear();
                                               list = map.values.toList();
@@ -212,36 +187,36 @@ class _SavingsScreenState extends State<SavingsScreen> {
                                                                   .portrait
                                                           ? constraints
                                                                   .maxHeight *
-                                                              0.4
+                                                              0.3
                                                           : constraints
                                                                   .maxHeight *
-                                                              0.7,
+                                                              0.5,
                                                       child: ListView.builder(
-                                                          itemCount: snapshot
-                                                              .data!
-                                                              .snapshot
-                                                              .children
-                                                              .length,
-                                                          itemBuilder:
-                                                              ((context,
-                                                                  index) {
-                                                            return TransactionCard(
-                                                                constraints:
-                                                                    constraints,
-                                                                dateAndTime:
-                                                                    formatDate(list[
-                                                                            index]
-                                                                        [
-                                                                        'paymentDateTime']),
-                                                                transactionAmount:
-                                                                    '- ${list[index]['amount']}',
-                                                                transactionName:
-                                                                    list[index][
-                                                                        'companyName'],
-                                                                width: constraints
-                                                                        .maxWidth *
-                                                                    0.05);
-                                                          })),
+                                                        itemCount: snapshot
+                                                            .data!
+                                                            .snapshot
+                                                            .children
+                                                            .length,
+                                                        itemBuilder:
+                                                            ((context, index) {
+                                                          return TransactionCard(
+                                                            dateAndTime:
+                                                                formatDate(list[
+                                                                        index][
+                                                                    'paymentDateTime']),
+                                                            transactionAmount:
+                                                                '${list[index]['amount']}',
+                                                            transactionName:
+                                                                list[index]
+                                                                    ['name'],
+                                                            width: constraints
+                                                                    .maxWidth *
+                                                                0.05,
+                                                            constraints:
+                                                                constraints,
+                                                          );
+                                                        }),
+                                                      ),
                                                     ),
                                                   ),
                                                 ],
@@ -271,63 +246,5 @@ class _SavingsScreenState extends State<SavingsScreen> {
             );
           }
         });
-  }
-}
-
-class SavingsCard extends StatelessWidget {
-  const SavingsCard({
-    super.key,
-    required this.orientation,
-    required this.constraints,
-    required this.title,
-    required this.iconName,
-    required this.verHeight,
-    required this.verWidth,
-    required this.horiHeight,
-    required this.horiWidth,
-  });
-
-  final Orientation orientation;
-  final BoxConstraints constraints;
-  final String title;
-  final IconData iconName;
-  final dynamic verHeight;
-  final dynamic verWidth;
-  final dynamic horiHeight;
-  final dynamic horiWidth;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: orientation == Orientation.portrait ? verHeight : horiHeight,
-      width: orientation == Orientation.portrait ? verWidth : horiWidth,
-      decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(15),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              iconName,
-              color: Colors.white,
-              size: 45,
-            ),
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
