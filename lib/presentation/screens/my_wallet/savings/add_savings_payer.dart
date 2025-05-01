@@ -50,59 +50,132 @@ class _AddSavingsPayerState extends State<AddSavingsPayer> {
     return null;
   }
 
-void _addSavings() async {
-  if (_formKey.currentState!.validate()) {
-    DatabaseReference savingsRef = ref.child(user.uid).child('split');
+  void _addSavings() async {
+    if (_formKey.currentState!.validate()) {
+      DatabaseReference savingsRef = ref.child(user.uid).child('split');
 
-    DataSnapshot snapshot = (await savingsRef
-        .child('savings')
-        .get()) as dynamic;
+      // Obtener saldo disponible de savings
+      DataSnapshot savingsSnapshot =
+          (await savingsRef.child('savings').get()) as dynamic;
+      var currentSavings = (savingsSnapshot.value) as dynamic ?? 0;
 
-    var currentSavings = (snapshot.value) as dynamic;
+      // Monto a gastar
+      double amountToSpend = double.parse(amountController.text);
 
-    // Verificar que hay suficiente saldo disponible
-    if (double.parse(amountController.text) > currentSavings) {
-      ToastMessage().toastMessage('Saldo insuficiente', Colors.red);
-      return;
+      // Verificar primero si hay suficiente saldo en savings
+      if (amountToSpend <= currentSavings) {
+        // Hay suficiente saldo en savings, proceder normalmente
+        processTransaction(savingsRef, currentSavings, false);
+      } else {
+        // No hay suficiente saldo en savings, verificar totalSavings
+        DataSnapshot totalSavingsSnapshot =
+            (await savingsRef.child('totalSavings').get()) as dynamic;
+        var currentTotalSavings = (totalSavingsSnapshot.value) as dynamic ?? 0;
+
+        if (amountToSpend <= currentTotalSavings) {
+          // Hay suficiente en totalSavings, preguntar al usuario
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Saldo insuficiente en ahorros'),
+                content: const Text(
+                  'No tienes suficiente saldo en tus ahorros actuales, ¿deseas utilizar tu ahorro total acumulado?',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Cerrar diálogo
+                    },
+                    child: const Text(
+                      'Cancelar',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Cerrar diálogo
+                      // Procesar transacción usando totalSavings
+                      processTransaction(savingsRef, currentTotalSavings, true);
+                    },
+                    child: const Text(
+                      'Sí, usar ahorro total',
+                      style: TextStyle(color: Colors.green),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          // No hay suficiente saldo en ninguno de los dos
+          ToastMessage().toastMessage(
+            'Saldo insuficiente en ahorros actuales y ahorro total',
+            Colors.red,
+          );
+        }
+      }
     }
+  }
 
-    // Agregar los datos del ahorro
+  // Función para procesar la transacción
+  void processTransaction(
+    DatabaseReference savingsRef,
+    dynamic currentBalance,
+    bool useTotal,
+  ) async {
+    // Obtener monto a gastar
+    double amount = double.parse(amountController.text);
+
+    // Crear datos de la transacción
     final savingsData = {
       'name': nameController.text,
-      'amount': double.parse(amountController.text),
-      'accountNumber': accountNumberController.text,
+      'amount': amount,
       'shortDescription': shortDescriptionController.text,
       'paymentDateTime': now.toIso8601String(),
     };
 
-    // Actualizar el saldo de ahorros (DISMINUIR en lugar de aumentar)
-    var updatedSavings = currentSavings - double.parse(amountController.text);
+    // Actualizar el saldo correspondiente
+    var updatedBalance = currentBalance - amount;
 
-    await savingsRef.update({
-      'savings': updatedSavings,
-      'savingsSpendings': ServerValue.increment(double.parse(amountController.text)),
-    });
+    if (useTotal) {
+      // Usar totalSavings
+      await savingsRef.update({
+        'totalSavings': updatedBalance,
+        'savingsSpendings': ServerValue.increment(amount),
+      });
+    } else {
+      // Usar savings normal
+      await savingsRef.update({
+        'savings': updatedBalance,
+        'savingsSpendings': ServerValue.increment(amount),
+      });
+    }
 
     // Registrar la transacción en los ahorros
-    savingsRef
-        .child('savingsTransactions')
-        .push()
-        .set(savingsData);
+    savingsRef.child('savingsTransactions').push().set(savingsData);
 
-    // Registrar en todas las transacciones con signo negativo para indicar gasto
+    // Registrar en todas las transacciones con signo negativo
     final allTransactionSaver = {
       ...savingsData,
-      'amount': '- ${amountController.text}'  // Cambio a signo negativo
+      'amount': '- ${amount}',
+      'usedTotalSavings':
+          useTotal, // Agregar campo para indicar si se usó ahorro total
     };
-    savingsRef
-        .child('allTransactions')
-        .push()
-        .set(allTransactionSaver);
+
+    savingsRef.child('allTransactions').push().set(allTransactionSaver);
 
     Navigator.pop(context);
-    ToastMessage().toastMessage('¡Ahorro registrado con éxito!', Colors.green);
+
+    if (useTotal) {
+      ToastMessage().toastMessage(
+        '¡Gasto registrado con éxito usando ahorro total!',
+        Colors.green,
+      );
+    } else {
+      ToastMessage().toastMessage('¡Gasto registrado con éxito!', Colors.green);
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -119,9 +192,7 @@ void _addSavings() async {
                       key: _formKey,
                       child: Column(
                         children: [
-                          SizedBox(
-                            height: constraints.maxHeight * 0.03,
-                          ),
+                          SizedBox(height: constraints.maxHeight * 0.03),
                           Row(
                             children: [
                               IconButton(
@@ -130,58 +201,50 @@ void _addSavings() async {
                                 },
                                 icon: const Icon(Icons.keyboard_backspace),
                               ),
-                              SizedBox(
-                                width: constraints.maxWidth * 0.03,
-                              ),
+                              SizedBox(width: constraints.maxWidth * 0.03),
                               const Text(
                                 'Agregar gasto',
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
-                                    fontSize: 28, fontWeight: FontWeight.w400),
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w400,
+                                ),
                               ),
                             ],
                           ),
-                          SizedBox(
-                            height: constraints.maxHeight * 0.03,
-                          ),
+                          SizedBox(height: constraints.maxHeight * 0.03),
                           CustomTextField(
                             hint: 'Nombre del gasto',
                             iconName: Icons.savings,
                             controller: nameController,
                             validator: _validateFormField,
                           ),
-                          SizedBox(
-                            height: constraints.maxHeight * 0.02,
-                          ),
+                          SizedBox(height: constraints.maxHeight * 0.02),
                           CustomTextField(
-                              hint: 'Monto a gastar',
-                              iconName: Icons.attach_money,
-                              controller: amountController,
-                              validator: _validateNumber,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly
-                              ]),
-                          SizedBox(
-                            height: constraints.maxHeight * 0.02,
+                            hint: 'Monto a gastar',
+                            iconName: Icons.attach_money,
+                            controller: amountController,
+                            validator: _validateNumber,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
                           ),
+                          SizedBox(height: constraints.maxHeight * 0.02),
                           CustomTextField(
                             hint: 'Objetivo o descripción',
                             iconName: Icons.subject,
                             controller: shortDescriptionController,
                             validator: null,
                           ),
-                          SizedBox(
-                            height: constraints.maxHeight * 0.04,
-                          ),
+                          SizedBox(height: constraints.maxHeight * 0.04),
                           TButton(
-                              constraints: constraints,
-                              btnColor: Theme.of(context).primaryColor,
-                              btnText: 'Guardar gasto',
-                              onPressed: _addSavings),
-                          SizedBox(
-                            height: constraints.maxHeight * 0.04,
+                            constraints: constraints,
+                            btnColor: Theme.of(context).primaryColor,
+                            btnText: 'Guardar gasto',
+                            onPressed: _addSavings,
                           ),
+                          SizedBox(height: constraints.maxHeight * 0.04),
                         ],
                       ),
                     ),

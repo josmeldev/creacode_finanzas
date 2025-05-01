@@ -142,7 +142,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
                                     ),
                                   ),
                                 ),
-
+                                SizedBox(height: constraints.maxHeight * 0.04),
                                 CustomCard(
                                   orientation: orientation,
                                   verHeight: constraints.maxHeight * 0.15,
