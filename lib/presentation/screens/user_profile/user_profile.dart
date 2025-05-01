@@ -25,6 +25,48 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
 
   final user = FirebaseAuth.instance.currentUser!;
 
+void clearUserSplitData() async {
+  // Obtener el usuario autenticado
+  User? user = FirebaseAuth.instance.currentUser;
+
+  if (user != null) {
+    // En lugar de eliminar los datos, establecemos valores iniciales
+    DatabaseReference splitRef =
+        ref.child(user.uid.toString()).child('split');
+    splitRef.set({
+      'amount': 0,
+      'need': 0,
+      'expenses': 0,
+      'savings': 0,
+      'totalBalance': 0,
+      'needAvailableBalance': 0,
+      'expensesAvailableBalance': 0,
+      'count': 1,
+      'isEFenabled': false,
+      'isCPenabled': false,
+      'isAutopayOn': false,
+      'targetEmergencyFunds': 0,
+      'collectedEmergencyFunds': 0,
+    }).then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Comienzando nuevo mes...'),
+          backgroundColor: kGreenColor,
+        ),
+      );
+    }).catchError((error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al reiniciar datos: $error'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    });
+  } else {
+    print("No hay usuario autenticado.");
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -41,9 +83,7 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        NullErrorMessage(
-                          message: 'Something went wrong!',
-                        ),
+                        NullErrorMessage(message: 'Something went wrong!'),
                       ],
                     ),
                   );
@@ -64,9 +104,7 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                SizedBox(
-                                  height: constraints.maxHeight * 0.03,
-                                ),
+                                SizedBox(height: constraints.maxHeight * 0.03),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -75,22 +113,25 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
                                       'Profile',
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
-                                          fontSize: 28,
-                                          fontWeight: FontWeight.w400),
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.w400,
+                                      ),
                                     ),
                                     IconButton(
-                                        onPressed: () {
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: ((context) =>
-                                                      const UpdateAccountScreen())));
-                                        },
-                                        icon: const Icon(Icons.edit))
+                                      onPressed: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder:
+                                                ((context) =>
+                                                    const UpdateAccountScreen()),
+                                          ),
+                                        );
+                                      },
+                                      icon: const Icon(Icons.edit),
+                                    ),
                                   ],
                                 ),
-                                SizedBox(
-                                  height: constraints.maxHeight * 0.03,
-                                ),
+                                SizedBox(height: constraints.maxHeight * 0.03),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -99,70 +140,75 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
                                           orientation == Orientation.portrait
                                               ? constraints.maxHeight * 0.2
                                               : constraints.maxHeight * 0.4,
-                                      width: orientation == Orientation.portrait
-                                          ? constraints.maxHeight * 0.2
-                                          : constraints.maxHeight * 0.4,
+                                      width:
+                                          orientation == Orientation.portrait
+                                              ? constraints.maxHeight * 0.2
+                                              : constraints.maxHeight * 0.4,
                                       decoration: BoxDecoration(
-                                          border: Border.all(
-                                              width: 4,
-                                              color:
-                                                  Theme.of(context).cardColor),
-                                          shape: BoxShape.circle,
-                                          color: Theme.of(context).canvasColor),
+                                        border: Border.all(
+                                          width: 4,
+                                          color: Theme.of(context).cardColor,
+                                        ),
+                                        shape: BoxShape.circle,
+                                        color: Theme.of(context).canvasColor,
+                                      ),
                                       child: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                        child: map['profilePic'].toString() ==
-                                                ""
-                                            ? const Icon(
-                                                Icons.person,
-                                                size: 90,
-                                                color: kGrayTextC,
-                                              )
-                                            : Image.network(
-                                                map['profilePic'].toString(),
-                                                fit: BoxFit.cover,
-                                              ),
+                                        borderRadius: BorderRadius.circular(
+                                          100,
+                                        ),
+                                        child:
+                                            map['profilePic'].toString() == ""
+                                                ? const Icon(
+                                                  Icons.person,
+                                                  size: 90,
+                                                  color: kGrayTextC,
+                                                )
+                                                : Image.network(
+                                                  map['profilePic'].toString(),
+                                                  fit: BoxFit.cover,
+                                                ),
                                       ),
                                     ),
                                   ],
                                 ),
-                                SizedBox(
-                                  height: constraints.maxHeight * 0.03,
+                                SizedBox(height: constraints.maxHeight * 0.03),
+                                ProfileTab(
+                                  constraints: constraints,
+                                  title: 'Full Name',
+                                  iconName: Icons.person,
+                                  titleValue: map['fullName'],
                                 ),
                                 ProfileTab(
-                                    constraints: constraints,
-                                    title: 'Full Name',
-                                    iconName: Icons.person,
-                                    titleValue: map['fullName']),
-                                ProfileTab(
-                                    constraints: constraints,
-                                    title: 'Phone number',
-                                    iconName: Icons.call,
-                                    titleValue: map['phoneNumber']),
-                                ProfileTab(
-                                    constraints: constraints,
-                                    title: 'Bank account number',
-                                    iconName: Icons.account_balance,
-                                    titleValue: map['bankAccNumber']),
-                                ProfileTab(
-                                    constraints: constraints,
-                                    title: 'KYC number',
-                                    iconName: Icons.person,
-                                    titleValue: map['kyc']),
-                                ProfileTab(
-                                    constraints: constraints,
-                                    title: 'Age',
-                                    iconName: Icons.person,
-                                    titleValue: map['age']),
-                                ProfileTab(
-                                    constraints: constraints,
-                                    title: 'Income Range',
-                                    iconName: Icons.attach_money,
-                                    titleValue: map['incomeRange']),
-                                SizedBox(
-                                  height: constraints.maxHeight * 0.01,
+                                  constraints: constraints,
+                                  title: 'Phone number',
+                                  iconName: Icons.call,
+                                  titleValue: map['phoneNumber'],
                                 ),
+                                ProfileTab(
+                                  constraints: constraints,
+                                  title: 'Bank account number',
+                                  iconName: Icons.account_balance,
+                                  titleValue: map['bankAccNumber'],
+                                ),
+                                ProfileTab(
+                                  constraints: constraints,
+                                  title: 'KYC number',
+                                  iconName: Icons.person,
+                                  titleValue: map['kyc'],
+                                ),
+                                ProfileTab(
+                                  constraints: constraints,
+                                  title: 'Age',
+                                  iconName: Icons.person,
+                                  titleValue: map['age'],
+                                ),
+                                ProfileTab(
+                                  constraints: constraints,
+                                  title: 'Income Range',
+                                  iconName: Icons.attach_money,
+                                  titleValue: map['incomeRange'],
+                                ),
+                                SizedBox(height: constraints.maxHeight * 0.01),
                                 Row(
                                   children: [
                                     const Text(
@@ -170,12 +216,10 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
                                       style: TextStyle(fontSize: 18),
                                     ),
                                     const Spacer(),
-                                    themeSwitch(context)
+                                    themeSwitch(context),
                                   ],
                                 ),
-                                SizedBox(
-                                  height: constraints.maxHeight * 0.04,
-                                ),
+                                SizedBox(height: constraints.maxHeight * 0.04),
                                 TButton(
                                   constraints: constraints,
                                   btnColor: Theme.of(context).primaryColor,
@@ -183,31 +227,25 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
                                   onPressed: () {
                                     FirebaseAuth.instance.signOut();
                                     Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const LoginScreen()));
-                                  },
-                                ),
-                                SizedBox(
-                                  height: constraints.maxHeight * 0.03,
-                                ),
-                                TButton(
-                                  constraints: constraints,
-                                  btnColor: Theme.of(context).primaryColor,
-                                  btnText: 'Reset Password',
-                                  onPressed: () {
-                                    PersistentNavBarNavigator.pushNewScreen(
                                       context,
-                                      screen: const ForgotPassScreen(),
-                                      withNavBar:
-                                          false, // OPTIONAL VALUE. True by default.
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => const LoginScreen(),
+                                      ),
                                     );
                                   },
                                 ),
-                                SizedBox(
-                                  height: constraints.maxHeight * 0.06,
+                                SizedBox(height: constraints.maxHeight * 0.03),
+                                TButton(
+                                  constraints: constraints,
+                                  btnColor: Theme.of(context).primaryColor,
+                                  btnText: 'Iniciar nuevo Mes',
+                                  onPressed: () {
+                                    clearUserSplitData(); // Esto está bien, no debería haber ningún valor de retorno usado.
+                                  },
                                 ),
+
+                                SizedBox(height: constraints.maxHeight * 0.06),
                               ],
                             ),
                           ),
@@ -221,9 +259,7 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
           }
         } else {
           return const Center(
-            child: CircularProgressIndicator(
-              color: kGreenColor,
-            ),
+            child: CircularProgressIndicator(color: kGreenColor),
           );
         }
       }),
@@ -238,24 +274,15 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
       padding: 0,
       activeToggleColor: kDarkCardC,
       inactiveToggleColor: Theme.of(context).primaryColor,
-      activeSwitchBorder: Border.all(
-        color: kDarkGreenBackC,
-        width: 4,
-      ),
-      inactiveSwitchBorder: Border.all(
-        color: kTextFieldBorderC,
-        width: 4,
-      ),
+      activeSwitchBorder: Border.all(color: kDarkGreenBackC, width: 4),
+      inactiveSwitchBorder: Border.all(color: kTextFieldBorderC, width: 4),
       activeColor: kDarkGreenColor,
       inactiveColor: kTextFieldColor,
       activeIcon: Icon(
         Icons.nightlight_round,
         color: Theme.of(context).primaryColor,
       ),
-      inactiveIcon: const Icon(
-        Icons.wb_sunny,
-        color: kTextFieldColor,
-      ),
+      inactiveIcon: const Icon(Icons.wb_sunny, color: kTextFieldColor),
       value: switchThemeIns.isDarkMode,
       onToggle: (value) {
         final provider = Provider.of<ThemeSwitch>(context, listen: false);

@@ -62,7 +62,7 @@ class _AddExpensesPayerState extends State<AddExpensesPayer> {
       var currentExpensesAvail = (snapshot.value) as dynamic;
 
       if (double.parse(amountController.text) > currentExpensesAvail) {
-        ToastMessage().toastMessage('Insufficient Balance', Colors.red);
+        ToastMessage().toastMessage('Saldo insuficiente', Colors.red);
       } else {
         // Check if payer already exists
         DataSnapshot payerSnapshot = await needIncomeRef
@@ -184,32 +184,10 @@ class _AddExpensesPayerState extends State<AddExpensesPayer> {
                           SizedBox(
                             height: constraints.maxHeight * 0.02,
                           ),
+                          
+                          
                           CustomTextField(
-                              hint: 'Método de pago',
-                              iconName: Icons.credit_card,
-                              controller: accountNumberController,
-                              validator: _validateNumber,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly
-                              ]),
-                          SizedBox(
-                            height: constraints.maxHeight * 0.02,
-                          ),
-                          CustomTextField(
-                              hint: 'Número de teléfono',
-                              iconName: Icons.call,
-                              controller: phoneNumberController,
-                              validator: _validateNumber,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly
-                              ]),
-                          SizedBox(
-                            height: constraints.maxHeight * 0.02,
-                          ),
-                          CustomTextField(
-                            hint: 'Descripción corta',
+                            hint: 'Método de pago',
                             iconName: Icons.subject,
                             controller: shortDescriptionController,
                             validator: null,

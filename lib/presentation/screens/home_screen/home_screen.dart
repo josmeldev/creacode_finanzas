@@ -97,13 +97,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         const NullErrorMessage(
                           message:
-                              'Something went wrong!\n Make sure you have verified your mail',
+                              '¡Algo salió mal!\n Asegúrate de haber verificado tu correo',
                         ),
                         const SizedBox(height: 20),
                         TButton(
                           constraints: constraints,
                           btnColor: Theme.of(context).primaryColor,
-                          btnText: 'Sign up again!',
+                          btnText: '¡Regístrate de nuevo!',
                           onPressed: () {
                             FirebaseAuth.instance.currentUser!.delete();
                             FirebaseAuth.instance.signOut;

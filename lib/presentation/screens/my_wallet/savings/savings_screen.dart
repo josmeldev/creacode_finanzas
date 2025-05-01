@@ -30,7 +30,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
           if (snapshot.hasData) {
             if (snapshot.data.snapshot.value == null) {
               return const NullErrorMessage(
-                message: 'Something went wrong!',
+                message: '¡Algo salió mal!',
               );
             } else {
               Map<dynamic, dynamic> map = snapshot.data.snapshot.value;

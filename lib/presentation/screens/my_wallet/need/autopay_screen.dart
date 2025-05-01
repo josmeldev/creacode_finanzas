@@ -55,7 +55,7 @@ class _AutopayScreenState extends State<AutopayScreen> {
                                       width: constraints.maxWidth * 0.03,
                                     ),
                                     const Text(
-                                      'Autopay transactions',
+                                      'Transacciones automáticas',
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
                                           fontSize: 24,
@@ -166,8 +166,8 @@ class _AutopayScreenState extends State<AutopayScreen> {
                                                                     .maxWidth *
                                                                 0.05,
                                                             status: isAutopayOn
-                                                                ? 'Pending'
-                                                                : 'Paid',
+                                                                ? 'Pendiente'
+                                                                : 'pagado',
                                                             statusColor:
                                                                 isAutopayOn
                                                                     ? kGreenColor
