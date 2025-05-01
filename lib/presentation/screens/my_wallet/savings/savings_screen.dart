@@ -211,7 +211,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
                                                           list[index]['paymentDateTime'],
                                                         ),
                                                         transactionAmount:
-                                                            '${list[index]['amount']}',
+                                                            '- ${list[index]['amount']}',
                                                         transactionName:
                                                             list[index]['name'],
                                                         width:
