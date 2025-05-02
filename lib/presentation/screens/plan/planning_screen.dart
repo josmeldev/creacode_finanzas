@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:creacode_finanzas/colors.dart';
 
 // Definir AppColors ya que no está disponible
 class AppColors {
@@ -110,71 +111,109 @@ void _calculateAndUpdateProjections(double totalSavings) {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard Financiero'),
-        backgroundColor: AppColors.primary,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Flujo de Caja'),
-            
-            Tab(text: 'Tendencias'),
-          ],
-          indicatorColor: Colors.white,
-        ),
-      ),
-      body: StreamBuilder(
-        stream: ref.child(user.uid).child('split').onValue,
-        builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+  @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: SafeArea(
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return OrientationBuilder(
+            builder: (BuildContext context, Orientation orientation) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: constraints.maxHeight * 0.03,
+                        ),
+                        const Text(
+                          'Gráficos dinámicos',
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              fontSize: 28, fontWeight: FontWeight.w400),
+                        ),
+                        SizedBox(
+                          height: constraints.maxHeight * 0.005,
+                        ),
+                        Container(
+                          child: TabBar(
+                            indicatorSize: TabBarIndicatorSize.label,
+                            labelColor: kGreenColor,
+                            controller: _tabController,
+                            unselectedLabelColor: Colors.grey,
+                            indicatorColor: kGreenColor,
+                            tabs: const [
+                              Tab(text: 'Flujo de Caja'),
+                              Tab(text: 'Tendencias'),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: StreamBuilder(
+                      stream: ref.child(user.uid).child('split').onValue,
+                      builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
 
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Error al cargar los datos: ${snapshot.error}',
-                style: const TextStyle(color: Colors.red),
-              ),
-            );
-          }
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Text(
+                              'Error al cargar los datos: ${snapshot.error}',
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                          );
+                        }
 
-          if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
-            return const Center(child: Text('No hay datos disponibles'));
-          }
+                        if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
+                          return const Center(child: Text('No hay datos disponibles'));
+                        }
 
-          // Convertir los datos a un formato utilizable
-          Map<dynamic, dynamic> splitData = Map<dynamic, dynamic>.from(
-            snapshot.data!.snapshot.value as Map,
-          );
+                        // Convertir los datos a un formato utilizable
+                        Map<dynamic, dynamic> splitData = Map<dynamic, dynamic>.from(
+                          snapshot.data!.snapshot.value as Map,
+                        );
 
-          // Extraer las transacciones
-          Map<dynamic, dynamic> allTransactions =
-              splitData.containsKey('allTransactions')
-                  ? Map<dynamic, dynamic>.from(
-                    splitData['allTransactions'] as Map,
-                  )
-                  : {};
+                        // Extraer las transacciones
+                        Map<dynamic, dynamic> allTransactions =
+                            splitData.containsKey('allTransactions')
+                                ? Map<dynamic, dynamic>.from(
+                                  splitData['allTransactions'] as Map,
+                                )
+                                : {};
 
-          // Procesar transacciones para análisis
-          List<TransactionData> transactionsList =
-              _processTransactionsForAnalysis(allTransactions);
+                        // Procesar transacciones para análisis
+                        List<TransactionData> transactionsList =
+                            _processTransactionsForAnalysis(allTransactions);
 
-          return TabBarView(
-            controller: _tabController,
-            children: [
-              // TAB 1: Flujo de Caja
-              _buildCashFlowTab(context, splitData, transactionsList),
-              // TAB 3: Tendencias
-              _buildTrendsTab(context, splitData, transactionsList),
-            ],
+                        return TabBarView(
+                          controller: _tabController,
+                          children: [
+                            // TAB 1: Flujo de Caja
+                            _buildCashFlowTab(context, splitData, transactionsList),
+                            // TAB 2: Tendencias
+                            _buildTrendsTab(context, splitData, transactionsList),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
           );
         },
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildCashFlowTab(
     BuildContext context,
