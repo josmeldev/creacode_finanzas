@@ -288,12 +288,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                           left: 70,
                                           child: SizedBox(
                                             height: 60,
-                                            child: Text(
-                                              (total).toStringAsFixed(0),
-                                              style: const TextStyle(
-                                                fontSize: 50,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
+                                            width:
+                                                200, // Definir un ancho máximo
+                                            child: FittedBox(
+                                              fit:
+                                                  BoxFit
+                                                      .scaleDown, // Reduce el tamaño del texto si es necesario
+                                              alignment:
+                                                  Alignment
+                                                      .centerLeft, // Alinear a la izquierda
+                                              child: Text(
+                                                (total).toStringAsFixed(0),
+                                                style: const TextStyle(
+                                                  fontSize:
+                                                      50, // Tamaño base que puede reducirse
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -461,16 +472,32 @@ class _HomeScreenState extends State<HomeScreen> {
                                     SizedBox(
                                       height: constraints.maxHeight * 0.02,
                                     ),
-                                    
-                                    CustomCard(
-                                      orientation: orientation,
-                                      verHeight: constraints.maxHeight * 0.14,
-                                      horiHeight: constraints.maxHeight * 0.35,
-                                      verWidth: constraints.maxHeight,
-                                      horiWidth: constraints.maxWidth,
-                                      cardTitle: 'Necesidades',
-                                      cardBalance: map['needAvailableBalance']
-                                          .toStringAsFixed(0),
+
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment
+                                              .center, // Centrar horizontalmente
+                                      children: [
+                                        CustomCard(
+                                          orientation: orientation,
+                                          verHeight:
+                                              constraints.maxHeight *
+                                              0.14, // Misma altura que las otras
+                                          horiHeight:
+                                              constraints.maxHeight * 0.35,
+                                          // Hacer que el ancho sea proporcional a las otras pero un poco más grande
+                                          verWidth:
+                                              constraints.maxWidth *
+                                              0.9, // 90% del ancho de la pantalla
+                                          horiWidth: constraints.maxWidth * 0.9,
+                                          cardTitle: 'Necesidades',
+                                          cardBalance:
+                                              map['needAvailableBalance']
+                                                  .toStringAsFixed(0),
+                                          isCentered:
+                                              true, // Nueva propiedad para indicar centrado de contenido
+                                        ),
+                                      ],
                                     ),
                                     SizedBox(
                                       height: constraints.maxHeight * 0.02,
@@ -493,6 +520,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           cardBalance:
                                               map['expensesAvailableBalance']
                                                   .toStringAsFixed(0),
+                                          isCentered: true,        
                                         ),
                                         CustomCard(
                                           orientation: orientation,
@@ -505,16 +533,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                           horiWidth:
                                               constraints.maxWidth * 0.45,
                                           cardTitle: 'Ahorros',
-                                          cardBalance:
-                                              map['savings']
-                                                  .toStringAsFixed(0),
+                                          cardBalance: map['savings']
+                                              .toStringAsFixed(0),
+                                        isCentered: true,
                                         ),
                                       ],
                                     ),
                                     SizedBox(
                                       height: constraints.maxHeight * 0.02,
                                     ),
-                                    
+
                                     SizedBox(
                                       height: constraints.maxHeight * 0.02,
                                     ),

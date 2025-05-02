@@ -73,6 +73,7 @@ class _NeedScreenState extends State<NeedScreen> {
                                       cardBalance: map['need'].toStringAsFixed(
                                         0,
                                       ),
+                                      isCentered: true,
                                     ),
                                     const SizedBox(width: 20),
                                     CustomCard(
@@ -87,6 +88,7 @@ class _NeedScreenState extends State<NeedScreen> {
                                               ? 0.toString()
                                               : map['needSpendings']
                                                   .toStringAsFixed(0),
+                                      isCentered: true,            
                                     ),
                                   ],
                                 ),

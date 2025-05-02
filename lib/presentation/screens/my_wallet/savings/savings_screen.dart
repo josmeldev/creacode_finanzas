@@ -78,6 +78,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
                                       cardBalance: ((map['savings'] ?? 0) +
                                               (map['savingsSpendings'] ?? 0))
                                           .toStringAsFixed(0),
+                                      isCentered: true,
                                     ),
                                     CustomCard(
                                       orientation: orientation,
@@ -91,6 +92,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
                                               ? '0'
                                               : map['savingsSpendings']
                                                   .toStringAsFixed(0),
+                                      isCentered: true,
                                     ),
                                   ],
                                 ),
@@ -149,10 +151,10 @@ class _SavingsScreenState extends State<SavingsScreen> {
                                   horiHeight: constraints.maxHeight * 0.5,
                                   verWidth:
                                       constraints.maxWidth *
-                                      0.95, // Ancho completo
+                                      0.90, // Ancho completo
                                   horiWidth:
                                       constraints.maxWidth *
-                                      0.95, // Ancho completo
+                                      0.90, // Ancho completo
                                   cardTitle: 'Ahorro Total',
                                   cardBalance:
                                       map['totalSavings'] == null
@@ -160,6 +162,8 @@ class _SavingsScreenState extends State<SavingsScreen> {
                                           : map['totalSavings'].toStringAsFixed(
                                             0,
                                           ),
+                                      
+                                  isCentered: true,
                                 ),
                                 SizedBox(height: constraints.maxHeight * 0.03),
                                 // Transacciones title

@@ -90,6 +90,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                             cardTitle: 'Ingreso',
                                             cardBalance: map['expenses']
                                                 .toStringAsFixed(0),
+                                          isCentered: true,
                                           ),
                                           CustomCard(
                                             orientation: orientation,
@@ -107,6 +108,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                                     ? 0.toString()
                                                     : map['expensesSpendings']
                                                         .toStringAsFixed(0),
+                                          isCentered: true,
                                           ),
                                         ],
                                       ),

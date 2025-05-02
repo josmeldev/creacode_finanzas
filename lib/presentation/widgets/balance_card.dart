@@ -34,16 +34,30 @@ class BalanceCard extends StatelessWidget {
         child: Icon(
           Icons.attach_money,
           color: Colors.white,
-          size: 55,
+          size: 47,
         ),
       ),
       Positioned(
         left: 85,
         bottom: 50,
-        child: Text(
-          amount,
-          style: const TextStyle(
-              fontSize: 56, color: Colors.white, fontWeight: FontWeight.bold),
+        // Usando FittedBox para adaptar el texto del saldo
+        child: Container(
+          // Limitamos el ancho máximo
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.55, // 55% del ancho de la pantalla
+          ),
+          child: FittedBox(
+            fit: BoxFit.scaleDown, // Escala hacia abajo si es necesario
+            alignment: Alignment.centerLeft,
+            child: Text(
+              amount,
+              style: const TextStyle(
+                fontSize: 40, // Tamaño original que se adaptará si es necesario
+                color: Colors.white, 
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ),
       ),
       Positioned(
