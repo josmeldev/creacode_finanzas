@@ -461,6 +461,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                     SizedBox(
                                       height: constraints.maxHeight * 0.02,
                                     ),
+                                    
+                                    CustomCard(
+                                      orientation: orientation,
+                                      verHeight: constraints.maxHeight * 0.14,
+                                      horiHeight: constraints.maxHeight * 0.35,
+                                      verWidth: constraints.maxHeight,
+                                      horiWidth: constraints.maxWidth,
+                                      cardTitle: 'Necesidades',
+                                      cardBalance: map['needAvailableBalance']
+                                          .toStringAsFixed(0),
+                                    ),
+                                    SizedBox(
+                                      height: constraints.maxHeight * 0.02,
+                                    ),
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -475,9 +489,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                               constraints.maxHeight * 0.22,
                                           horiWidth:
                                               constraints.maxWidth * 0.45,
-                                          cardTitle: 'Necesidades',
+                                          cardTitle: 'Deseos',
                                           cardBalance:
-                                              map['needAvailableBalance']
+                                              map['expensesAvailableBalance']
                                                   .toStringAsFixed(0),
                                         ),
                                         CustomCard(
@@ -490,9 +504,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                               constraints.maxHeight * 0.23,
                                           horiWidth:
                                               constraints.maxWidth * 0.45,
-                                          cardTitle: 'Deseos',
+                                          cardTitle: 'Ahorros',
                                           cardBalance:
-                                              map['expensesAvailableBalance']
+                                              map['savings']
                                                   .toStringAsFixed(0),
                                         ),
                                       ],
@@ -500,16 +514,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     SizedBox(
                                       height: constraints.maxHeight * 0.02,
                                     ),
-                                    CustomCard(
-                                      orientation: orientation,
-                                      verHeight: constraints.maxHeight * 0.14,
-                                      horiHeight: constraints.maxHeight * 0.35,
-                                      verWidth: constraints.maxHeight,
-                                      horiWidth: constraints.maxWidth,
-                                      cardTitle: 'Ahorros',
-                                      cardBalance: map['savings']
-                                          .toStringAsFixed(0),
-                                    ),
+                                    
                                     SizedBox(
                                       height: constraints.maxHeight * 0.02,
                                     ),
