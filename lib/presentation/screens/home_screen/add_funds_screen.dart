@@ -245,7 +245,7 @@ class _AddFundsScreenState extends State<AddFundsScreen> {
                             style: TextStyle(color: kGrayTextC, fontSize: 14),
                             textAlign: TextAlign.start,
                           ),
-                          SizedBox(height: constraints.maxHeight * 0.04),
+                          SizedBox(height: constraints.maxHeight * 0.02),
                           TButton(
                               constraints: constraints,
                               btnColor: Theme.of(context).primaryColor,
