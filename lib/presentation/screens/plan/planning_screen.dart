@@ -700,114 +700,165 @@ Widget _buildFutureProjectionChart(List<TransactionData> transactions) {
     maxValue = _projectedSavings.reduce((a, b) => a > b ? a : b);
   }
   
-  return SizedBox(
-    height: 200,
-    child: _projectedSavings.any((value) => value > 0)
-      ? LineChart(
-          LineChartData(
-            gridData: FlGridData(
-              show: true,
-              drawVerticalLine: true,
-              // Solo mostrar líneas verticales en enteros
-              checkToShowVerticalLine: (value) => value.toInt() == value,
-              getDrawingVerticalLine: (value) {
-                return FlLine(
-                  color: Colors.grey.withOpacity(0.2),
-                  strokeWidth: 1,
-                );
-              },
-              getDrawingHorizontalLine: (value) {
-                return FlLine(
-                  color: Colors.grey.withOpacity(0.2),
-                  strokeWidth: 1,
-                );
-              },
+  // Determinar colores basados en el tema actual
+  final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  final Color textColor = isDarkMode ? Colors.white70 : Colors.black54;
+  final Color gridColor = isDarkMode ? Colors.white30 : Colors.grey.withOpacity(0.2);
+  final Color borderColor = isDarkMode ? Colors.white24 : Colors.grey.withOpacity(0.2);
+  
+  return Card(
+    elevation: 4,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Proyección de ahorros',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.black87,
             ),
-            titlesData: FlTitlesData(
-              show: true,
-              // Configuración para el eje X inferior (visible)
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 30,
-                  getTitlesWidget: (value, meta) {
-                    // Solo mostrar enteros
-                    if (value.toInt() == value && value >= 0 && value < months.length) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          (value + 1).toInt().toString(),
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.black54,
-                          ),
-                        ),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
-              ),
-              // Configuración para el eje Y izquierdo (visible)
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 40,
-                  getTitlesWidget: (value, meta) {
-                    // Solo mostrar números enteros
-                    if (value == value.toInt()) {
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: Text(
-                          '\$${value.toInt()}',
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Colors.black54,
-                          ),
-                        ),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
-              ),
-              // Configuración para el eje X superior (oculto)
-              topTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-              // Configuración para el eje Y derecho (oculto)
-              rightTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-            ),
-            borderData: FlBorderData(
-              show: true,
-              border: Border.all(color: Colors.grey.withOpacity(0.2)),
-            ),
-            minX: 0,
-            maxX: 5,
-            minY: 0,
-            maxY: maxValue * 1.2, // Espacio adicional arriba
-            lineBarsData: [
-              LineChartBarData(
-                spots: List.generate(
-                  _projectedSavings.length,
-                  (index) => FlSpot(index.toDouble(), _projectedSavings[index]),
-                ),
-                isCurved: true,
-                color: AppColors.savingsColor,
-                barWidth: 3,
-                isStrokeCapRound: true,
-                dotData: const FlDotData(show: false),
-                belowBarData: BarAreaData(
-                  show: true,
-                  color: AppColors.savingsColor.withOpacity(0.2),
-                ),
-              ),
-            ],
           ),
-        )
-      : const Center(child: Text("Cargando proyecciones..."))
+          const SizedBox(height: 20),
+          SizedBox(
+            height: 200,
+            child: _projectedSavings.any((value) => value > 0)
+              ? LineChart(
+                  LineChartData(
+                    gridData: FlGridData(
+                      show: true,
+                      drawVerticalLine: true,
+                      // Solo mostrar líneas verticales en enteros
+                      checkToShowVerticalLine: (value) => value.toInt() == value,
+                      getDrawingVerticalLine: (value) {
+                        return FlLine(
+                          color: gridColor,
+                          strokeWidth: 1,
+                        );
+                      },
+                      getDrawingHorizontalLine: (value) {
+                        return FlLine(
+                          color: gridColor,
+                          strokeWidth: 1,
+                        );
+                      },
+                    ),
+                    titlesData: FlTitlesData(
+                      show: true,
+                      // Configuración para el eje X inferior (visible)
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 30,
+                          getTitlesWidget: (value, meta) {
+                            // Solo mostrar enteros
+                            if (value.toInt() == value && value >= 0 && value < months.length) {
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  (value + 1).toInt().toString(),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: textColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                      ),
+                      // Configuración para el eje Y izquierdo (visible)
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 45,
+                          getTitlesWidget: (value, meta) {
+                            // Solo mostrar algunos números para evitar aglomeración
+                            if (value % 1000 == 0) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: Text(
+                                  '\$${value.toInt()}',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: textColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                      ),
+                      // Configuración para el eje X superior (oculto)
+                      topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      // Configuración para el eje Y derecho (oculto)
+                      rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                    ),
+                    borderData: FlBorderData(
+                      show: true,
+                      border: Border.all(color: borderColor),
+                    ),
+                    minX: 0,
+                    maxX: 5,
+                    minY: 0,
+                    maxY: maxValue * 1.2, // Espacio adicional arriba
+                    lineBarsData: [
+                      LineChartBarData(
+                        spots: List.generate(
+                          _projectedSavings.length,
+                          (index) => FlSpot(index.toDouble(), _projectedSavings[index]),
+                        ),
+                        isCurved: true,
+                        color: AppColors.savingsColor,
+                        barWidth: 3,
+                        isStrokeCapRound: true,
+                        dotData: const FlDotData(show: false),
+                        belowBarData: BarAreaData(
+                          show: true,
+                          color: AppColors.savingsColor.withOpacity(0.2),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(
+                        height: 40,
+                        width: 40,
+                        child: CircularProgressIndicator(
+                          color: AppColors.savingsColor,
+                          strokeWidth: 3,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Cargando proyecciones...",
+                        style: TextStyle(
+                          color: isDarkMode ? Colors.white70 : Colors.grey.shade700,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+          ),
+        ],
+      ),
+    ),
   );
 }
 
