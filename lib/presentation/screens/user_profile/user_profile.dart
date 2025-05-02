@@ -77,14 +77,26 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
                     double currentTotalSavings =
                         (currentData['totalSavings'] ?? 0).toDouble();
 
+                    double currentNeedAvailableBalance =
+                        (currentData['needAvailableBalance'] ?? 0)
+                            .toDouble();
+
+                    double currentExpensesAvailableBalance =
+                        (currentData['expensesAvailableBalance'] ?? 0)
+                            .toDouble();
+                    double currentAmount = (currentData['amount'] ?? 0).toDouble();
+                            
                     // Sumamos el ahorro disponible actual al total acumulado
                     double newTotalSavings =
-                        currentTotalSavings + currentSavings;
+                        currentTotalSavings + currentSavings + 
+                            currentNeedAvailableBalance +
+                            currentExpensesAvailableBalance;
 
+                    
                     // Establecemos los nuevos valores, incluyendo el totalSavings actualizado
                     splitRef
                         .set({
-                          'amount': 0,
+                          'amount': currentAmount,
                           'need': 0,
                           'expenses': 0,
                           'savings': 0,
