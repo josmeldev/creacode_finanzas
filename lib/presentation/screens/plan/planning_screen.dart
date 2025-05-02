@@ -691,22 +691,103 @@ void _calculateAndUpdateProjections(double totalSavings) {
   }
 
 Widget _buildFutureProjectionChart(List<TransactionData> transactions) {
-  // Ya no necesitas hacer la llamada Firebase aquí, 
-  // porque _projectedSavings ya está actualizado desde initState
+  // Meses para mostrar en el eje X
+  final List<String> months = ['1 Mes', '2 Mes', '3 Mes', '4 Mes', '5 Mes', '6 Mes'];
+  
+  // Encontrar el valor máximo para el límite superior
+  double maxValue = 0;
+  if (_projectedSavings.isNotEmpty) {
+    maxValue = _projectedSavings.reduce((a, b) => a > b ? a : b);
+  }
   
   return SizedBox(
     height: 200,
     child: _projectedSavings.any((value) => value > 0)
       ? LineChart(
           LineChartData(
-            gridData: const FlGridData(show: true),
-            titlesData: FlTitlesData(
-              // Resto de la configuración
-              // ...
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: true,
+              // Solo mostrar líneas verticales en enteros
+              checkToShowVerticalLine: (value) => value.toInt() == value,
+              getDrawingVerticalLine: (value) {
+                return FlLine(
+                  color: Colors.grey.withOpacity(0.2),
+                  strokeWidth: 1,
+                );
+              },
+              getDrawingHorizontalLine: (value) {
+                return FlLine(
+                  color: Colors.grey.withOpacity(0.2),
+                  strokeWidth: 1,
+                );
+              },
             ),
-            borderData: FlBorderData(show: true),
+            titlesData: FlTitlesData(
+              show: true,
+              // Configuración para el eje X inferior (visible)
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 30,
+                  getTitlesWidget: (value, meta) {
+                    // Solo mostrar enteros
+                    if (value.toInt() == value && value >= 0 && value < months.length) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          (value + 1).toInt().toString(),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ),
+              // Configuración para el eje Y izquierdo (visible)
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 40,
+                  getTitlesWidget: (value, meta) {
+                    // Solo mostrar números enteros
+                    if (value == value.toInt()) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Text(
+                          '\$${value.toInt()}',
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ),
+              // Configuración para el eje X superior (oculto)
+              topTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              // Configuración para el eje Y derecho (oculto)
+              rightTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+            ),
+            borderData: FlBorderData(
+              show: true,
+              border: Border.all(color: Colors.grey.withOpacity(0.2)),
+            ),
             minX: 0,
             maxX: 5,
+            minY: 0,
+            maxY: maxValue * 1.2, // Espacio adicional arriba
             lineBarsData: [
               LineChartBarData(
                 spots: List.generate(
@@ -717,7 +798,7 @@ Widget _buildFutureProjectionChart(List<TransactionData> transactions) {
                 color: AppColors.savingsColor,
                 barWidth: 3,
                 isStrokeCapRound: true,
-                dotData: const FlDotData(show: false), // Cambia a false para evitar los puntos
+                dotData: const FlDotData(show: false),
                 belowBarData: BarAreaData(
                   show: true,
                   color: AppColors.savingsColor.withOpacity(0.2),
@@ -726,7 +807,7 @@ Widget _buildFutureProjectionChart(List<TransactionData> transactions) {
             ],
           ),
         )
-      : Center(child: Text("Cargando proyecciones..."))
+      : const Center(child: Text("Cargando proyecciones..."))
   );
 }
 
