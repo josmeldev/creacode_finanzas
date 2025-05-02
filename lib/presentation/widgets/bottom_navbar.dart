@@ -50,7 +50,7 @@ class _BottomNavState extends State<BottomNav> {
       PersistentBottomNavBarItem(
           inactiveColorPrimary: navBarColor,
           activeColorPrimary: navBarColor,
-          icon: const Icon(Icons.article)),
+          icon: const Icon(Icons.bar_chart)),
       PersistentBottomNavBarItem(
           inactiveColorPrimary: navBarColor,
           activeColorPrimary: navBarColor,
