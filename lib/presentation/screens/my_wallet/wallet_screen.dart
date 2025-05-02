@@ -28,18 +28,17 @@ class _WalletScreenState extends State<WalletScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        height: constraints.maxHeight * 0.03,
-                      ),
-                      const Text(
-                        'Mi Billetera',
+                      SizedBox(height: constraints.maxHeight * 0.03),
+                      Text(
+                        'Mi billetera',
                         textAlign: TextAlign.start,
                         style: TextStyle(
-                            fontSize: 28, fontWeight: FontWeight.w400),
+                          fontSize: 32,
+                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                      SizedBox(
-                        height: constraints.maxHeight * 0.005,
-                      ),
+                      SizedBox(height: constraints.maxHeight * 0.005),
                       Container(
                         child: TabBar(
                           indicatorSize: TabBarIndicatorSize.label,

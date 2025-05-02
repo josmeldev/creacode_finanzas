@@ -37,271 +37,178 @@ class _PlanningScreeenState extends State<PlanningScreeen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     _loadSavingsProjection();
   }
 
   void _loadSavingsProjection() {
-  final userId = user.uid;
-  
-  ref.child(userId).child('split/totalSavings')
-    .get()
-    .then((DataSnapshot snapshot) {
+    final userId = user.uid;
+
+    ref.child(userId).child('split/totalSavings').get().then((
+      DataSnapshot snapshot,
+    ) {
       if (snapshot.exists && snapshot.value != null) {
         double totalSavings = double.parse(snapshot.value.toString());
-        
+
         // Calcular proyecciones (mueve aquí la lógica de proyección)
         // Primero obtén los promedios de las transacciones
         _calculateAndUpdateProjections(totalSavings);
       }
     });
-}
+  }
 
-void _calculateAndUpdateProjections(double totalSavings) {
-  // Obtén las transacciones primero
-  ref.child(user.uid).child('split/allTransactions').get().then((snapshot) {
-    if (snapshot.exists && snapshot.value != null) {
-      Map<dynamic, dynamic> allTransactions = Map<dynamic, dynamic>.from(
-        snapshot.value as Map,
-      );
-      
-      List<TransactionData> transactions = _processTransactionsForAnalysis(allTransactions);
-      
-      // Calcula promedios como antes
-      double totalIncome = 0;
-      double totalExpenses = 0;
-      int incomeCount = 0;
-      int expenseCount = 0;
-      
-      for (var transaction in transactions) {
-        if (transaction.amount >= 0) {
-          totalIncome += transaction.amount;
-          incomeCount++;
-        } else {
-          totalExpenses += transaction.amount.abs();
-          expenseCount++;
+  void _calculateAndUpdateProjections(double totalSavings) {
+    // Obtén las transacciones primero
+    ref.child(user.uid).child('split/allTransactions').get().then((snapshot) {
+      if (snapshot.exists && snapshot.value != null) {
+        Map<dynamic, dynamic> allTransactions = Map<dynamic, dynamic>.from(
+          snapshot.value as Map,
+        );
+
+        List<TransactionData> transactions = _processTransactionsForAnalysis(
+          allTransactions,
+        );
+
+        // Calcula promedios como antes
+        double totalIncome = 0;
+        double totalExpenses = 0;
+        int incomeCount = 0;
+        int expenseCount = 0;
+
+        for (var transaction in transactions) {
+          if (transaction.amount >= 0) {
+            totalIncome += transaction.amount;
+            incomeCount++;
+          } else {
+            totalExpenses += transaction.amount.abs();
+            expenseCount++;
+          }
         }
-      }
-      
-      double avgIncome = incomeCount > 0 ? totalIncome / incomeCount : 0;
-      double avgExpenses = expenseCount > 0 ? totalExpenses / expenseCount : 0;
-      double netSavingsPerPeriod = avgIncome - avgExpenses;
-      
-      // Proyectar para los próximos 6 meses
-      List<double> projectedSavings = [];
-      double currentSavings = totalSavings;
-      
-      for (int i = 0; i < 6; i++) {
-        currentSavings += netSavingsPerPeriod;
-        projectedSavings.add(currentSavings);
-      }
-      
-      // Actualizar una sola vez
-      setState(() {
-        _projectedSavings = projectedSavings;
-      });
-    }
-  });
-}
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+        double avgIncome = incomeCount > 0 ? totalIncome / incomeCount : 0;
+        double avgExpenses =
+            expenseCount > 0 ? totalExpenses / expenseCount : 0;
+        double netSavingsPerPeriod = avgIncome - avgExpenses;
+
+        // Proyectar para los próximos 6 meses
+        List<double> projectedSavings = [];
+        double currentSavings = totalSavings;
+
+        for (int i = 0; i < 6; i++) {
+          currentSavings += netSavingsPerPeriod;
+          projectedSavings.add(currentSavings);
+        }
+
+        // Actualizar una sola vez
+        setState(() {
+          _projectedSavings = projectedSavings;
+        });
+      }
+    });
   }
 
-  @override
-  @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    body: SafeArea(
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          return OrientationBuilder(
-            builder: (BuildContext context, Orientation orientation) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: constraints.maxHeight * 0.03,
-                        ),
-                        const Text(
-                          'Gráficos dinámicos',
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                              fontSize: 28, fontWeight: FontWeight.w400),
-                        ),
-                        SizedBox(
-                          height: constraints.maxHeight * 0.005,
-                        ),
-                        Container(
-                          child: TabBar(
-                            indicatorSize: TabBarIndicatorSize.label,
-                            labelColor: kGreenColor,
-                            controller: _tabController,
-                            unselectedLabelColor: Colors.grey,
-                            indicatorColor: kGreenColor,
-                            tabs: const [
-                              Tab(text: 'Flujo de Caja'),
-                              Tab(text: 'Tendencias'),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: StreamBuilder(
-                      stream: ref.child(user.uid).child('split').onValue,
-                      builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-
-                        if (snapshot.hasError) {
-                          return Center(
-                            child: Text(
-                              'Error al cargar los datos: ${snapshot.error}',
-                              style: const TextStyle(color: Colors.red),
+@override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            return OrientationBuilder(
+              builder: (BuildContext context, Orientation orientation) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: constraints.maxHeight * 0.03),
+                          Text(
+                            'Gráficos dinámicos',
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 32,
+                              color: Theme.of(context).primaryColor,
+                              fontWeight: FontWeight.w600,
                             ),
-                          );
-                        }
-
-                        if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
-                          return const Center(child: Text('No hay datos disponibles'));
-                        }
-
-                        // Convertir los datos a un formato utilizable
-                        Map<dynamic, dynamic> splitData = Map<dynamic, dynamic>.from(
-                          snapshot.data!.snapshot.value as Map,
-                        );
-
-                        // Extraer las transacciones
-                        Map<dynamic, dynamic> allTransactions =
-                            splitData.containsKey('allTransactions')
-                                ? Map<dynamic, dynamic>.from(
-                                  splitData['allTransactions'] as Map,
-                                )
-                                : {};
-
-                        // Procesar transacciones para análisis
-                        List<TransactionData> transactionsList =
-                            _processTransactionsForAnalysis(allTransactions);
-
-                        return TabBarView(
-                          controller: _tabController,
-                          children: [
-                            // TAB 1: Flujo de Caja
-                            _buildCashFlowTab(context, splitData, transactionsList),
-                            // TAB 2: Tendencias
-                            _buildTrendsTab(context, splitData, transactionsList),
-                          ],
-                        );
-                      },
+                          ),
+                          SizedBox(height: constraints.maxHeight * 0.01),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-      ),
-    ),
-  );
-}
+                    Expanded(
+                      child: StreamBuilder(
+                        stream: ref.child(user.uid).child('split').onValue,
+                        builder: (
+                          context,
+                          AsyncSnapshot<DatabaseEvent> snapshot,
+                        ) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
 
-  Widget _buildCashFlowTab(
-    BuildContext context,
-    Map<dynamic, dynamic> splitData,
-    List<TransactionData> transactions,
-  ) {
-    // Calcular ingresos y gastos por fecha
-    final Map<DateTime, double> incomeByDate = {};
-    final Map<DateTime, double> expensesByDate = {};
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text(
+                                'Error al cargar los datos: ${snapshot.error}',
+                                style: const TextStyle(color: Colors.red),
+                              ),
+                            );
+                          }
 
-    for (var transaction in transactions) {
-      // Normalizar la fecha (solo día, sin hora)
-      final normalizedDate = DateTime(
-        transaction.date.year,
-        transaction.date.month,
-        transaction.date.day,
-      );
+                          if (!snapshot.hasData ||
+                              snapshot.data!.snapshot.value == null) {
+                            return const Center(
+                              child: Text('No hay datos disponibles'),
+                            );
+                          }
 
-      if (transaction.amount >= 0) {
-        incomeByDate[normalizedDate] =
-            (incomeByDate[normalizedDate] ?? 0) + transaction.amount;
-      } else {
-        expensesByDate[normalizedDate] =
-            (expensesByDate[normalizedDate] ?? 0) + transaction.amount.abs();
-      }
-    }
+                          // Convertir los datos a un formato utilizable
+                          Map<dynamic, dynamic> splitData =
+                              Map<dynamic, dynamic>.from(
+                                snapshot.data!.snapshot.value as Map,
+                              );
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSummaryCard(context, splitData, transactions),
-          const SizedBox(height: 20),
+                          // Extraer las transacciones
+                          Map<dynamic, dynamic> allTransactions =
+                              splitData.containsKey('allTransactions')
+                                  ? Map<dynamic, dynamic>.from(
+                                    splitData['allTransactions'] as Map,
+                                  )
+                                  : {};
 
+                          // Procesar transacciones para análisis
+                          List<TransactionData> transactionsList =
+                              _processTransactionsForAnalysis(allTransactions);
 
-          
-        ],
-      ),
-    );
-  }
-
-
-
-  Widget _buildTrendsTab(
-    BuildContext context,
-    Map<dynamic, dynamic> splitData,
-    List<TransactionData> transactions,
-  ) {
-    
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Balance de Ahorro',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-
-          _buildSavingsBalanceCard(splitData),
-
-          const SizedBox(height: 20),
-          const Text(
-            'Proyección a Futuro',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-
-          _buildFutureProjectionChart(transactions),
-        ],
+                          // Combinar ambas pantallas en una sola vista con SingleChildScrollView
+                          return _buildCombinedView(
+                            context,
+                            splitData,
+                            transactionsList,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildSummaryCard(
+  Widget _buildCombinedView(
     BuildContext context,
     Map<dynamic, dynamic> splitData,
     List<TransactionData> transactions,
   ) {
-    double totalBalance = (splitData['amount'] ?? 0).toDouble();
-    double expenses = (splitData['expensesSpendings'] ?? 0).toDouble();
-    double needs = (splitData['needSpendings'] ?? 0).toDouble();
-    double savings = (splitData['savingsSpendings'] ?? 0).toDouble();
-
-    // Calcular tendencias por mes
+    // Calcular tendencias por mes para el gráfico mensual
     Map<int, double> incomeByMonth = {};
     Map<int, double> expensesByMonth = {};
 
@@ -318,159 +225,72 @@ Widget build(BuildContext context) {
       }
     }
 
-    return Container(
-  width: double.infinity,
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      const Text(
-        'Balance total acumulado',
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-      ),
-      const SizedBox(height: 8),
-      Text(
-        '\$${totalBalance.toStringAsFixed(2)}',
-        style: const TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-          color: AppColors.primary,
-        ),
-      ),
-      
-      const SizedBox(height: 20),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Sección 1: Resumen total
+          Container(
+            width: double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text(
+                  'Balance total acumulado',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '\$${(splitData['amount'] ?? 0).toDouble().toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Sección 2: Balance de Ahorro
+          const Text(
+            'Balance de Ahorro',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          _buildSavingsBalanceCard(splitData),
+
+          const SizedBox(height: 20),
+
+          // Sección 3: Proporción de Presupuesto
           const Text(
             'Proporción de Presupuesto',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
-
           _buildBudgetProportionChart(splitData),
 
           const SizedBox(height: 20),
-           const Text(
+
+          // Sección 4: Tendencia Mensual
+          const Text(
             'Tendencia Mensual',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
-
           SizedBox(
             height: 300,
             child: _buildMonthlyTrendChart(incomeByMonth, expensesByMonth),
           ),
 
           const SizedBox(height: 20),
-    ],
-  ),
-);
-
-  }
-
-  
-
-  Widget _buildCashFlowChart(List<TransactionData> transactions) {
-    // Filtrar por rango de fechas seleccionado
-    DateTime startDate;
-    final now = DateTime.now();
-
-    switch (selectedDateRange) {
-      case 'Semana':
-        startDate = DateTime(now.year, now.month, now.day - 7);
-        break;
-      case 'Mes':
-        startDate = DateTime(now.year, now.month - 1, now.day);
-        break;
-      case 'Año':
-        startDate = DateTime(now.year - 1, now.month, now.day);
-        break;
-      default:
-        startDate = DateTime(now.year, now.month, now.day - 7);
-    }
-
-    // Filtrar transacciones por el rango de fechas
-    final filteredTransactions =
-        transactions
-            .where((transaction) => transaction.date.isAfter(startDate))
-            .toList();
-
-    // Agrupar por fecha
-    Map<DateTime, double> dailyBalances = {};
-
-    // Inicializar días en el rango
-    for (int i = 0; i <= now.difference(startDate).inDays; i++) {
-      final date = DateTime(startDate.year, startDate.month, startDate.day + i);
-      dailyBalances[date] = 0;
-    }
-
-    // Sumar transacciones por día
-    for (var transaction in filteredTransactions) {
-      final date = DateTime(
-        transaction.date.year,
-        transaction.date.month,
-        transaction.date.day,
-      );
-      dailyBalances[date] = (dailyBalances[date] ?? 0) + transaction.amount;
-    }
-
-    // Convertir a lista ordenada por fecha
-    List<MapEntry<DateTime, double>> sortedEntries =
-        dailyBalances.entries.toList()..sort((a, b) => a.key.compareTo(b.key));
-
-    return LineChart(
-      LineChartData(
-        gridData: const FlGridData(show: true),
-        titlesData: FlTitlesData(
-          leftTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: true, reservedSize: 40),
-          ),
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              getTitlesWidget: (value, meta) {
-                if (value.toInt() >= 0 &&
-                    value.toInt() < sortedEntries.length) {
-                  final date = sortedEntries[value.toInt()].key;
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Text(
-                      DateFormat('dd/MM').format(date),
-                      style: const TextStyle(fontSize: 10),
-                    ),
-                  );
-                }
-                return const Text('');
-              },
-            ),
-          ),
-          rightTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
-          ),
-          topTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
-          ),
-        ),
-        borderData: FlBorderData(show: true),
-        minX: 0,
-        maxX: sortedEntries.length - 1.0,
-        lineBarsData: [
-          LineChartBarData(
-            spots: List.generate(sortedEntries.length, (index) {
-              return FlSpot(index.toDouble(), sortedEntries[index].value);
-            }),
-            isCurved: true,
-            color: AppColors.primary,
-            barWidth: 3,
-            isStrokeCapRound: true,
-            dotData: const FlDotData(show: false),
-            belowBarData: BarAreaData(
-              show: true,
-              color: AppColors.primary.withOpacity(0.2),
-            ),
-          ),
         ],
       ),
     );
   }
-
 
   Widget _buildBudgetProportionChart(Map<dynamic, dynamic> splitData) {
     double expenses = (splitData['expensesSpendings'] ?? 0).toDouble();
@@ -729,179 +549,194 @@ Widget build(BuildContext context) {
     );
   }
 
-Widget _buildFutureProjectionChart(List<TransactionData> transactions) {
-  // Meses para mostrar en el eje X
-  final List<String> months = ['1 Mes', '2 Mes', '3 Mes', '4 Mes', '5 Mes', '6 Mes'];
-  
-  // Encontrar el valor máximo para el límite superior
-  double maxValue = 0;
-  if (_projectedSavings.isNotEmpty) {
-    maxValue = _projectedSavings.reduce((a, b) => a > b ? a : b);
-  }
-  
-  // Determinar colores basados en el tema actual
-  final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-  final Color textColor = isDarkMode ? Colors.white70 : Colors.black54;
-  final Color gridColor = isDarkMode ? Colors.white30 : Colors.grey.withOpacity(0.2);
-  final Color borderColor = isDarkMode ? Colors.white24 : Colors.grey.withOpacity(0.2);
-  
-  return Card(
-    elevation: 4,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Proyección de ahorros',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            height: 200,
-            child: _projectedSavings.any((value) => value > 0)
-              ? LineChart(
-                  LineChartData(
-                    gridData: FlGridData(
-                      show: true,
-                      drawVerticalLine: true,
-                      // Solo mostrar líneas verticales en enteros
-                      checkToShowVerticalLine: (value) => value.toInt() == value,
-                      getDrawingVerticalLine: (value) {
-                        return FlLine(
-                          color: gridColor,
-                          strokeWidth: 1,
-                        );
-                      },
-                      getDrawingHorizontalLine: (value) {
-                        return FlLine(
-                          color: gridColor,
-                          strokeWidth: 1,
-                        );
-                      },
-                    ),
-                    titlesData: FlTitlesData(
-                      show: true,
-                      // Configuración para el eje X inferior (visible)
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 30,
-                          getTitlesWidget: (value, meta) {
-                            // Solo mostrar enteros
-                            if (value.toInt() == value && value >= 0 && value < months.length) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: Text(
-                                  (value + 1).toInt().toString(),
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: textColor,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              );
-                            }
-                            return const SizedBox.shrink();
-                          },
-                        ),
-                      ),
-                      // Configuración para el eje Y izquierdo (visible)
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 45,
-                          getTitlesWidget: (value, meta) {
-                            // Solo mostrar algunos números para evitar aglomeración
-                            if (value % 1000 == 0) {
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
-                                child: Text(
-                                  '\$${value.toInt()}',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: textColor,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              );
-                            }
-                            return const SizedBox.shrink();
-                          },
-                        ),
-                      ),
-                      // Configuración para el eje X superior (oculto)
-                      topTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      // Configuración para el eje Y derecho (oculto)
-                      rightTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                    ),
-                    borderData: FlBorderData(
-                      show: true,
-                      border: Border.all(color: borderColor),
-                    ),
-                    minX: 0,
-                    maxX: 5,
-                    minY: 0,
-                    maxY: maxValue * 1.2, // Espacio adicional arriba
-                    lineBarsData: [
-                      LineChartBarData(
-                        spots: List.generate(
-                          _projectedSavings.length,
-                          (index) => FlSpot(index.toDouble(), _projectedSavings[index]),
-                        ),
-                        isCurved: true,
-                        color: AppColors.savingsColor,
-                        barWidth: 3,
-                        isStrokeCapRound: true,
-                        dotData: const FlDotData(show: false),
-                        belowBarData: BarAreaData(
-                          show: true,
-                          color: AppColors.savingsColor.withOpacity(0.2),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(
-                        height: 40,
-                        width: 40,
-                        child: CircularProgressIndicator(
-                          color: AppColors.savingsColor,
-                          strokeWidth: 3,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        "Cargando proyecciones...",
-                        style: TextStyle(
-                          color: isDarkMode ? Colors.white70 : Colors.grey.shade700,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
+  Widget _buildFutureProjectionChart(List<TransactionData> transactions) {
+    // Meses para mostrar en el eje X
+    final List<String> months = [
+      '1 Mes',
+      '2 Mes',
+      '3 Mes',
+      '4 Mes',
+      '5 Mes',
+      '6 Mes',
+    ];
 
-List<TransactionData> _processTransactionsForAnalysis(
+    // Encontrar el valor máximo para el límite superior
+    double maxValue = 0;
+    if (_projectedSavings.isNotEmpty) {
+      maxValue = _projectedSavings.reduce((a, b) => a > b ? a : b);
+    }
+
+    // Determinar colores basados en el tema actual
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final Color textColor = isDarkMode ? Colors.white70 : Colors.black54;
+    final Color gridColor =
+        isDarkMode ? Colors.white30 : Colors.grey.withOpacity(0.2);
+    final Color borderColor =
+        isDarkMode ? Colors.white24 : Colors.grey.withOpacity(0.2);
+
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Proyección de ahorros',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              height: 200,
+              child:
+                  _projectedSavings.any((value) => value > 0)
+                      ? LineChart(
+                        LineChartData(
+                          gridData: FlGridData(
+                            show: true,
+                            drawVerticalLine: true,
+                            // Solo mostrar líneas verticales en enteros
+                            checkToShowVerticalLine:
+                                (value) => value.toInt() == value,
+                            getDrawingVerticalLine: (value) {
+                              return FlLine(color: gridColor, strokeWidth: 1);
+                            },
+                            getDrawingHorizontalLine: (value) {
+                              return FlLine(color: gridColor, strokeWidth: 1);
+                            },
+                          ),
+                          titlesData: FlTitlesData(
+                            show: true,
+                            // Configuración para el eje X inferior (visible)
+                            bottomTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 30,
+                                getTitlesWidget: (value, meta) {
+                                  // Solo mostrar enteros
+                                  if (value.toInt() == value &&
+                                      value >= 0 &&
+                                      value < months.length) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        (value + 1).toInt().toString(),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: textColor,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                  return const SizedBox.shrink();
+                                },
+                              ),
+                            ),
+                            // Configuración para el eje Y izquierdo (visible)
+                            leftTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 45,
+                                getTitlesWidget: (value, meta) {
+                                  // Solo mostrar algunos números para evitar aglomeración
+                                  if (value % 1000 == 0) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                        right: 8.0,
+                                      ),
+                                      child: Text(
+                                        '\$${value.toInt()}',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: textColor,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                  return const SizedBox.shrink();
+                                },
+                              ),
+                            ),
+                            // Configuración para el eje X superior (oculto)
+                            topTitles: const AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                            // Configuración para el eje Y derecho (oculto)
+                            rightTitles: const AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                          ),
+                          borderData: FlBorderData(
+                            show: true,
+                            border: Border.all(color: borderColor),
+                          ),
+                          minX: 0,
+                          maxX: 5,
+                          minY: 0,
+                          maxY: maxValue * 1.2, // Espacio adicional arriba
+                          lineBarsData: [
+                            LineChartBarData(
+                              spots: List.generate(
+                                _projectedSavings.length,
+                                (index) => FlSpot(
+                                  index.toDouble(),
+                                  _projectedSavings[index],
+                                ),
+                              ),
+                              isCurved: true,
+                              color: AppColors.savingsColor,
+                              barWidth: 3,
+                              isStrokeCapRound: true,
+                              dotData: const FlDotData(show: false),
+                              belowBarData: BarAreaData(
+                                show: true,
+                                color: AppColors.savingsColor.withOpacity(0.2),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                      : Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(
+                              height: 40,
+                              width: 40,
+                              child: CircularProgressIndicator(
+                                color: AppColors.savingsColor,
+                                strokeWidth: 3,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              "Cargando proyecciones...",
+                              style: TextStyle(
+                                color:
+                                    isDarkMode
+                                        ? Colors.white70
+                                        : Colors.grey.shade700,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<TransactionData> _processTransactionsForAnalysis(
     Map<dynamic, dynamic> transactions,
   ) {
     List<TransactionData> result = [];
