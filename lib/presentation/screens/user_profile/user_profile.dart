@@ -193,7 +193,7 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        NullErrorMessage(message: 'Something went wrong!'),
+                        NullErrorMessage(message: 'Algo salió mal!'),
                       ],
                     ),
                   );
@@ -220,25 +220,14 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     const Text(
-                                      'Profile',
+                                      'Perfil',
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
                                         fontSize: 28,
                                         fontWeight: FontWeight.w400,
                                       ),
                                     ),
-                                    IconButton(
-                                      onPressed: () {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder:
-                                                ((context) =>
-                                                    const UpdateAccountScreen()),
-                                          ),
-                                        );
-                                      },
-                                      icon: const Icon(Icons.edit),
-                                    ),
+                                    
                                   ],
                                 ),
                                 SizedBox(height: constraints.maxHeight * 0.03),
@@ -284,37 +273,37 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
                                 SizedBox(height: constraints.maxHeight * 0.03),
                                 ProfileTab(
                                   constraints: constraints,
-                                  title: 'Full Name',
+                                  title: 'Nombre', 
                                   iconName: Icons.person,
                                   titleValue: map['fullName'],
                                 ),
                                 ProfileTab(
                                   constraints: constraints,
-                                  title: 'Phone number',
+                                  title: 'Telefono',
                                   iconName: Icons.call,
                                   titleValue: map['phoneNumber'],
                                 ),
                                 ProfileTab(
                                   constraints: constraints,
-                                  title: 'Bank account number',
+                                  title: 'Número de cuenta',
                                   iconName: Icons.account_balance,
                                   titleValue: map['bankAccNumber'],
                                 ),
                                 ProfileTab(
                                   constraints: constraints,
-                                  title: 'KYC number',
+                                  title: 'DNI',
                                   iconName: Icons.person,
                                   titleValue: map['kyc'],
                                 ),
                                 ProfileTab(
                                   constraints: constraints,
-                                  title: 'Age',
+                                  title: 'Edad',
                                   iconName: Icons.person,
                                   titleValue: map['age'],
                                 ),
                                 ProfileTab(
                                   constraints: constraints,
-                                  title: 'Income Range',
+                                  title: 'Rango de ingresos',
                                   iconName: Icons.attach_money,
                                   titleValue: map['incomeRange'],
                                 ),
@@ -322,7 +311,7 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
                                 Row(
                                   children: [
                                     const Text(
-                                      'Dark Mode',
+                                      'Modo Oscuro',
                                       style: TextStyle(fontSize: 18),
                                     ),
                                     const Spacer(),
@@ -333,7 +322,7 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
                                 TButton(
                                   constraints: constraints,
                                   btnColor: Theme.of(context).primaryColor,
-                                  btnText: 'Sign out',
+                                  btnText: 'Salir',
                                   onPressed: () {
                                     FirebaseAuth.instance.signOut();
                                     Navigator.pushReplacement(
