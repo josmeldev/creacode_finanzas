@@ -178,13 +178,7 @@ class _PlanningScreeenState extends State<PlanningScreeen>
           SizedBox(height: 300, child: _buildCashFlowChart(transactions)),
 
           const SizedBox(height: 20),
-          const Text(
-            'Resumen por Categoría',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-
-          _buildCategoryBreakdown(splitData),
+          
         ],
       ),
     );
@@ -298,58 +292,32 @@ class _PlanningScreeenState extends State<PlanningScreeen>
     double needs = (splitData['needSpendings'] ?? 0).toDouble();
     double savings = (splitData['savingsSpendings'] ?? 0).toDouble();
 
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Text(
-              'Balance total acumulado',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '\$${totalBalance.toStringAsFixed(2)}',
-              style: const TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildSummaryItem('Gastos', expenses, AppColors.expenseColor),
-                _buildSummaryItem('Necesidades', needs, AppColors.needColor),
-                _buildSummaryItem('Ahorros', savings, AppColors.savingsColor),
-              ],
-            ),
-          ],
+    return Container(
+  width: double.infinity,
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      const Text(
+        'Balance total acumulado',
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      ),
+      const SizedBox(height: 8),
+      Text(
+        '\$${totalBalance.toStringAsFixed(2)}',
+        style: const TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: AppColors.primary,
         ),
       ),
-    );
+      const SizedBox(height: 20),
+    ],
+  ),
+);
+
   }
 
-  Widget _buildSummaryItem(String title, double amount, Color color) {
-    return Column(
-      children: [
-        Text(title, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-        const SizedBox(height: 4),
-        Text(
-          '\$${amount.toStringAsFixed(2)}',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-      ],
-    );
-  }
+  
 
   Widget _buildCashFlowChart(List<TransactionData> transactions) {
     // Filtrar por rango de fechas seleccionado
@@ -454,73 +422,6 @@ class _PlanningScreeenState extends State<PlanningScreeen>
       ),
     );
   }
-
-  Widget _buildCategoryBreakdown(Map<dynamic, dynamic> splitData) {
-    double expenses = (splitData['expenses'] ?? 0).toDouble();
-    double needs = (splitData['need'] ?? 0).toDouble();
-    double savings = (splitData['savings'] ?? 0).toDouble();
-    double total = expenses + needs + savings;
-
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildCategoryProgressBar(
-              'Gastos',
-              expenses,
-              total,
-              AppColors.expenseColor,
-            ),
-            const SizedBox(height: 10),
-            _buildCategoryProgressBar(
-              'Necesidades',
-              needs,
-              total,
-              AppColors.needColor,
-            ),
-            const SizedBox(height: 10),
-            _buildCategoryProgressBar(
-              'Ahorros',
-              savings,
-              total,
-              AppColors.savingsColor,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryProgressBar(
-    String category,
-    double amount,
-    double total,
-    Color color,
-  ) {
-    final percentage = total > 0 ? (amount / total * 100) : 0;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [Text(category), Text('${percentage.toStringAsFixed(1)}%')],
-        ),
-        const SizedBox(height: 5),
-        LinearProgressIndicator(
-          value: total > 0 ? amount / total : 0,
-          backgroundColor: Colors.grey.shade200,
-          valueColor: AlwaysStoppedAnimation<Color>(color),
-          minHeight: 8,
-          borderRadius: BorderRadius.circular(4),
-        ),
-      ],
-    );
-  }
-
 
 
   Widget _buildBudgetProportionChart(Map<dynamic, dynamic> splitData) {
