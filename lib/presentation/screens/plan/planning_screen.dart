@@ -31,12 +31,77 @@ class _PlanningScreeenState extends State<PlanningScreeen>
 
   String selectedDateRange = 'Semana';
   List<String> dateRangeOptions = ['Semana', 'Mes', 'Año'];
+  List<double> _projectedSavings = [0, 0, 0, 0, 0, 0];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
+    _loadSavingsProjection();
   }
+
+  void _loadSavingsProjection() {
+  final userId = user.uid;
+  
+  ref.child(userId).child('split/totalSavings')
+    .get()
+    .then((DataSnapshot snapshot) {
+      if (snapshot.exists && snapshot.value != null) {
+        double totalSavings = double.parse(snapshot.value.toString());
+        
+        // Calcular proyecciones (mueve aquí la lógica de proyección)
+        // Primero obtén los promedios de las transacciones
+        _calculateAndUpdateProjections(totalSavings);
+      }
+    });
+}
+
+void _calculateAndUpdateProjections(double totalSavings) {
+  // Obtén las transacciones primero
+  ref.child(user.uid).child('split/allTransactions').get().then((snapshot) {
+    if (snapshot.exists && snapshot.value != null) {
+      Map<dynamic, dynamic> allTransactions = Map<dynamic, dynamic>.from(
+        snapshot.value as Map,
+      );
+      
+      List<TransactionData> transactions = _processTransactionsForAnalysis(allTransactions);
+      
+      // Calcula promedios como antes
+      double totalIncome = 0;
+      double totalExpenses = 0;
+      int incomeCount = 0;
+      int expenseCount = 0;
+      
+      for (var transaction in transactions) {
+        if (transaction.amount >= 0) {
+          totalIncome += transaction.amount;
+          incomeCount++;
+        } else {
+          totalExpenses += transaction.amount.abs();
+          expenseCount++;
+        }
+      }
+      
+      double avgIncome = incomeCount > 0 ? totalIncome / incomeCount : 0;
+      double avgExpenses = expenseCount > 0 ? totalExpenses / expenseCount : 0;
+      double netSavingsPerPeriod = avgIncome - avgExpenses;
+      
+      // Proyectar para los próximos 6 meses
+      List<double> projectedSavings = [];
+      double currentSavings = totalSavings;
+      
+      for (int i = 0; i < 6; i++) {
+        currentSavings += netSavingsPerPeriod;
+        projectedSavings.add(currentSavings);
+      }
+      
+      // Actualizar una sola vez
+      setState(() {
+        _projectedSavings = projectedSavings;
+      });
+    }
+  });
+}
 
   @override
   void dispose() {
@@ -54,7 +119,7 @@ class _PlanningScreeenState extends State<PlanningScreeen>
           controller: _tabController,
           tabs: const [
             Tab(text: 'Flujo de Caja'),
-            Tab(text: 'Distribución'),
+            
             Tab(text: 'Tendencias'),
           ],
           indicatorColor: Colors.white,
@@ -102,10 +167,6 @@ class _PlanningScreeenState extends State<PlanningScreeen>
             children: [
               // TAB 1: Flujo de Caja
               _buildCashFlowTab(context, splitData, transactionsList),
-
-              // TAB 2: Distribución de Gastos
-              _buildDistributionTab(context, splitData, transactionsList),
-
               // TAB 3: Tendencias
               _buildTrendsTab(context, splitData, transactionsList),
             ],
@@ -146,122 +207,30 @@ class _PlanningScreeenState extends State<PlanningScreeen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSummaryCard(context, splitData),
+          _buildSummaryCard(context, splitData, transactions),
           const SizedBox(height: 20),
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Flujo de Caja',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              DropdownButton<String>(
-                value: selectedDateRange,
-                items:
-                    dateRangeOptions.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedDateRange = newValue!;
-                  });
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
 
-          SizedBox(height: 300, child: _buildCashFlowChart(transactions)),
-
-          const SizedBox(height: 20),
           
         ],
       ),
     );
   }
 
-  Widget _buildDistributionTab(
-    BuildContext context,
-    Map<dynamic, dynamic> splitData,
-    List<TransactionData> transactions,
-  ) {
-    // Calcular gastos por categoría
-    Map<String, double> expensesByCategory = {};
 
-    for (var transaction in transactions) {
-      if (transaction.amount < 0) {
-        // Solo gastos
-        expensesByCategory[transaction.name] =
-            (expensesByCategory[transaction.name] ?? 0) +
-            transaction.amount.abs();
-      }
-    }
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          
-
-          const SizedBox(height: 20),
-          const Text(
-            'Proporción de Presupuesto',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-
-          _buildBudgetProportionChart(splitData),
-
-          const SizedBox(height: 20),
-        ],
-      ),
-    );
-  }
 
   Widget _buildTrendsTab(
     BuildContext context,
     Map<dynamic, dynamic> splitData,
     List<TransactionData> transactions,
   ) {
-    // Calcular tendencias por mes
-    Map<int, double> incomeByMonth = {};
-    Map<int, double> expensesByMonth = {};
-
-    for (var transaction in transactions) {
-      // Clave del mes (Año-Mes)
-      final monthKey = transaction.date.month;
-
-      if (transaction.amount >= 0) {
-        incomeByMonth[monthKey] =
-            (incomeByMonth[monthKey] ?? 0) + transaction.amount;
-      } else {
-        expensesByMonth[monthKey] =
-            (expensesByMonth[monthKey] ?? 0) + transaction.amount.abs();
-      }
-    }
+    
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Tendencia Mensual',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-
-          SizedBox(
-            height: 300,
-            child: _buildMonthlyTrendChart(incomeByMonth, expensesByMonth),
-          ),
-
-          const SizedBox(height: 20),
           const Text(
             'Balance de Ahorro',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -286,11 +255,29 @@ class _PlanningScreeenState extends State<PlanningScreeen>
   Widget _buildSummaryCard(
     BuildContext context,
     Map<dynamic, dynamic> splitData,
+    List<TransactionData> transactions,
   ) {
     double totalBalance = (splitData['amount'] ?? 0).toDouble();
     double expenses = (splitData['expensesSpendings'] ?? 0).toDouble();
     double needs = (splitData['needSpendings'] ?? 0).toDouble();
     double savings = (splitData['savingsSpendings'] ?? 0).toDouble();
+
+    // Calcular tendencias por mes
+    Map<int, double> incomeByMonth = {};
+    Map<int, double> expensesByMonth = {};
+
+    for (var transaction in transactions) {
+      // Clave del mes (Año-Mes)
+      final monthKey = transaction.date.month;
+
+      if (transaction.amount >= 0) {
+        incomeByMonth[monthKey] =
+            (incomeByMonth[monthKey] ?? 0) + transaction.amount;
+      } else {
+        expensesByMonth[monthKey] =
+            (expensesByMonth[monthKey] ?? 0) + transaction.amount.abs();
+      }
+    }
 
     return Container(
   width: double.infinity,
@@ -310,7 +297,29 @@ class _PlanningScreeenState extends State<PlanningScreeen>
           color: AppColors.primary,
         ),
       ),
+      
       const SizedBox(height: 20),
+          const Text(
+            'Proporción de Presupuesto',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+
+          _buildBudgetProportionChart(splitData),
+
+          const SizedBox(height: 20),
+           const Text(
+            'Tendencia Mensual',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+
+          SizedBox(
+            height: 300,
+            child: _buildMonthlyTrendChart(incomeByMonth, expensesByMonth),
+          ),
+
+          const SizedBox(height: 20),
     ],
   ),
 );
@@ -681,97 +690,47 @@ class _PlanningScreeenState extends State<PlanningScreeen>
     );
   }
 
-  Widget _buildFutureProjectionChart(List<TransactionData> transactions) {
-    // Calcular ingresos y gastos medios
-    double totalIncome = 0;
-    double totalExpenses = 0;
-    int incomeCount = 0;
-    int expenseCount = 0;
-
-    for (var transaction in transactions) {
-      if (transaction.amount >= 0) {
-        totalIncome += transaction.amount;
-        incomeCount++;
-      } else {
-        totalExpenses += transaction.amount.abs();
-        expenseCount++;
-      }
-    }
-
-    // Calcular promedios
-    double avgIncome = incomeCount > 0 ? totalIncome / incomeCount : 0;
-    double avgExpenses = expenseCount > 0 ? totalExpenses / expenseCount : 0;
-    double netSavingsPerPeriod = avgIncome - avgExpenses;
-
-    // Proyectar para los próximos 6 meses
-    List<double> projectedSavings = [];
-    double currentSavings = 0;
-
-    for (int i = 0; i < 6; i++) {
-      currentSavings += netSavingsPerPeriod;
-      projectedSavings.add(currentSavings);
-    }
-
-    return SizedBox(
-      height: 200,
-      child: LineChart(
-        LineChartData(
-          gridData: const FlGridData(show: true),
-          titlesData: FlTitlesData(
-            leftTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: true, reservedSize: 40),
+Widget _buildFutureProjectionChart(List<TransactionData> transactions) {
+  // Ya no necesitas hacer la llamada Firebase aquí, 
+  // porque _projectedSavings ya está actualizado desde initState
+  
+  return SizedBox(
+    height: 200,
+    child: _projectedSavings.any((value) => value > 0)
+      ? LineChart(
+          LineChartData(
+            gridData: const FlGridData(show: true),
+            titlesData: FlTitlesData(
+              // Resto de la configuración
+              // ...
             ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  if (value.toInt() >= 0 && value.toInt() < 6) {
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(
-                        'Mes ${value.toInt() + 1}',
-                        style: const TextStyle(fontSize: 10),
-                      ),
-                    );
-                  }
-                  return const Text('');
-                },
-                reservedSize: 30,
+            borderData: FlBorderData(show: true),
+            minX: 0,
+            maxX: 5,
+            lineBarsData: [
+              LineChartBarData(
+                spots: List.generate(
+                  _projectedSavings.length,
+                  (index) => FlSpot(index.toDouble(), _projectedSavings[index]),
+                ),
+                isCurved: true,
+                color: AppColors.savingsColor,
+                barWidth: 3,
+                isStrokeCapRound: true,
+                dotData: const FlDotData(show: false), // Cambia a false para evitar los puntos
+                belowBarData: BarAreaData(
+                  show: true,
+                  color: AppColors.savingsColor.withOpacity(0.2),
+                ),
               ),
-            ),
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            topTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
+            ],
           ),
-          borderData: FlBorderData(show: true),
-          minX: 0,
-          maxX: 5,
-          lineBarsData: [
-            LineChartBarData(
-              spots: List.generate(
-                projectedSavings.length,
-                (index) => FlSpot(index.toDouble(), projectedSavings[index]),
-              ),
-              isCurved: true,
-              color: AppColors.savingsColor,
-              barWidth: 3,
-              isStrokeCapRound: true,
-              dotData: const FlDotData(show: true),
-              belowBarData: BarAreaData(
-                show: true,
-                color: AppColors.savingsColor.withOpacity(0.2),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+        )
+      : Center(child: Text("Cargando proyecciones..."))
+  );
+}
 
-  List<TransactionData> _processTransactionsForAnalysis(
+List<TransactionData> _processTransactionsForAnalysis(
     Map<dynamic, dynamic> transactions,
   ) {
     List<TransactionData> result = [];
