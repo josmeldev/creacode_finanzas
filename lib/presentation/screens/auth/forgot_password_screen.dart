@@ -89,7 +89,7 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                               children: [
                                 SizedBox(height: constraints.maxHeight * 0.015),
                                 const Text(
-                                  'Forgot Password',
+                                  'Has olvidado tu contraseña',
                                   style: TextStyle(
                                     fontSize: 28,
                                   ),
@@ -98,7 +98,7 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                                   height: constraints.maxHeight * 0.03,
                                 ),
                                 Text(
-                                  'Enter the email associated with your account and we will send you link to reset the password',
+                                  'Ingresa el email asociado a tu cuenta y te enviaremos un link para restablecer la contraseña',
                                   style: TextStyle(
                                       color: Theme.of(context).primaryColor),
                                 ),
@@ -106,12 +106,12 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                                   height: constraints.maxHeight * 0.03,
                                 ),
                                 CustomTextField(
-                                  hint: 'Email',
+                                  hint: 'Correo',
                                   iconName: Icons.alternate_email,
                                   controller: emailController,
                                   validator: (value) {
                                     if (value!.isEmpty) {
-                                      return 'Enter Email';
+                                      return 'Ingresa tu correo';
                                     }
                                     return null;
                                   },
@@ -125,7 +125,7 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                                     loading: loading,
                                     constraints: constraints,
                                     btnColor: Theme.of(context).primaryColor,
-                                    btnText: 'Reset Password',
+                                    btnText: 'Restablecer contraseña',
                                     onPressed: () {
                                       if (_formKey.currentState!.validate()) {
                                         forgotPassword();

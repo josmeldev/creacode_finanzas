@@ -1,9 +1,6 @@
 import 'package:creacode_finanzas/colors.dart';
 import 'package:creacode_finanzas/logic/flutter_toast.dart';
 import 'package:creacode_finanzas/presentation/screens/auth/forgot_password_screen.dart';
-
-import 'package:creacode_finanzas/presentation/screens/auth/signup_screen.dart';
-
 import 'package:creacode_finanzas/presentation/widgets/button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -185,33 +182,7 @@ Future login() async {
                                       SizedBox(
                                         height: constraints.maxHeight * 0.01,
                                       ),
-                                      Row(
-                                        children: [
-                                          const Text(
-                                            'Eres nuevo en CreaCode Finanzas?',
-                                            style: TextStyle(
-                                                color: kGrayTextC,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w400),
-                                          ),
-                                          TextButton(
-                                            child: Text(
-                                              'Crear',
-                                              style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .primaryColor,
-                                                  fontSize: 16),
-                                            ),
-                                            onPressed: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const SignupScreen()));
-                                            },
-                                          ),
-                                        ],
-                                      ),
+                                      
                                       TextButton(
                                         child: Text(
                                           'Olvidate tu contraseña?',
