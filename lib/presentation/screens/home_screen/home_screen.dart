@@ -59,24 +59,8 @@ class _HomeScreenState extends State<HomeScreen> {
   //   super.dispose();
   // }
 
-  dynamic accountNumber;
-  void getAccountNum() {
-    DatabaseReference accNumRef = ref
-        .child(user.uid.toString())
-        .child('bankAccNumber');
-
-    accNumRef.once().then((snapshot) {
-      if (mounted) {
-        setState(() {
-          accountNumber = (snapshot.snapshot.value) as dynamic;
-        });
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    getAccountNum();
     return WillPopScope(
       onWillPop: () async {
         // isAutoPayOn = false;
@@ -389,20 +373,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                           right: 20,
                                           child: GestureDetector(
                                             onTap: () {
-                                              getAccountNum();
-                                              accountNumber == ""
-                                                  ? ToastMessage().toastMessage(
-                                                    'Please update your account!',
-                                                    Colors.red,
-                                                  )
-                                                  : Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder:
-                                                          (context) =>
-                                                              const AddFundsScreen(),
-                                                    ),
-                                                  );
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder:
+                                                      (context) =>
+                                                          const AddFundsScreen(),
+                                                ),
+                                              );
                                             },
                                             child: Container(
                                               height:
@@ -520,7 +498,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           cardBalance:
                                               map['expensesAvailableBalance']
                                                   .toStringAsFixed(0),
-                                          isCentered: true,        
+                                          isCentered: true,
                                         ),
                                         CustomCard(
                                           orientation: orientation,
@@ -535,7 +513,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           cardTitle: 'Ahorros',
                                           cardBalance: map['savings']
                                               .toStringAsFixed(0),
-                                        isCentered: true,
+                                          isCentered: true,
                                         ),
                                       ],
                                     ),
