@@ -21,7 +21,7 @@ class CheckMailScreen extends StatelessWidget {
           ),
           Center(
             child: Text(
-              'We have sent you a link to\nreset the password!',
+              '¡Te hemos enviado un enlace\n para restablecer la contraseña!',
               style:
                   TextStyle(fontSize: 20, color: Theme.of(context).cardColor),
               textAlign: TextAlign.center,

@@ -80,11 +80,11 @@ Future login() async {
                     child: Column(
                       children: [
                         SizedBox(
-                          height: constraints.maxHeight * 0.2,
+                          height: constraints.maxHeight * 0.16,
                         ),
                         const Center(
                           child: Text(
-                            'Budgeto',
+                            'CreaCode\nFinanzas',
                             style: TextStyle(
                                 fontSize: 50,
                                 fontWeight: FontWeight.bold,
@@ -92,7 +92,7 @@ Future login() async {
                           ),
                         ),
                         SizedBox(
-                          height: constraints.maxHeight * 0.2,
+                          height: constraints.maxHeight * 0.1,
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -119,7 +119,7 @@ Future login() async {
                                           height:
                                               constraints.maxHeight * 0.015),
                                       const Text(
-                                        'Log in\nto your account',
+                                        'Iniciar sesión\nen su cuenta',
                                         style: TextStyle(
                                           fontSize: 30,
                                         ),
@@ -128,13 +128,17 @@ Future login() async {
                                         height: constraints.maxHeight * 0.025,
                                       ),
                                       CustomTextField(
-                                        hint: 'Email',
+                                        hint: 'Correo',
                                         iconName: Icons.alternate_email,
                                         controller: emailController,
                                         obscureText: false,
                                         validator: (value) {
                                           if (value!.isEmpty) {
-                                            return 'Enter Email';
+                                            return 'Ingrese el correo';
+                                          } else if (!RegExp(
+                                                  r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+                                              .hasMatch(value)) {
+                                            return 'Ingrese un correo válido';
                                           }
                                           return null;
                                         },
@@ -145,13 +149,15 @@ Future login() async {
                                         height: constraints.maxHeight * 0.025,
                                       ),
                                       CustomTextField(
-                                        hint: 'Password',
+                                        hint: 'Contraseña',
                                         iconName: Icons.lock,
                                         controller: passwordController,
                                         obscureText: true,
                                         validator: (value) {
                                           if (value!.isEmpty) {
-                                            return 'Enter Password';
+                                            return 'Ingrese la contraseña';
+                                          } else if (value.length < 6) {
+                                            return 'La contraseña debe tener al menos 6 caracteres';
                                           }
                                           return null;
                                         },
@@ -168,7 +174,7 @@ Future login() async {
                                         constraints: constraints,
                                         btnColor:
                                             Theme.of(context).primaryColor,
-                                        btnText: 'Login',
+                                        btnText: 'Ingresar',
                                         onPressed: () {
                                           if (_formKey.currentState!
                                               .validate()) {
@@ -182,7 +188,7 @@ Future login() async {
                                       Row(
                                         children: [
                                           const Text(
-                                            'New to Budgeto?',
+                                            'Eres nuevo en CreaCode Finanzas?',
                                             style: TextStyle(
                                                 color: kGrayTextC,
                                                 fontSize: 16,
@@ -190,7 +196,7 @@ Future login() async {
                                           ),
                                           TextButton(
                                             child: Text(
-                                              'Register',
+                                              'Crear',
                                               style: TextStyle(
                                                   color: Theme.of(context)
                                                       .primaryColor,
@@ -208,7 +214,7 @@ Future login() async {
                                       ),
                                       TextButton(
                                         child: Text(
-                                          'Forgot Password?',
+                                          'Olvidate tu contraseña?',
                                           style: TextStyle(
                                               color: Theme.of(context)
                                                   .primaryColor,

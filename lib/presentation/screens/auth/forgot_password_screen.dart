@@ -34,7 +34,7 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
         .then((value) {
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (context) => const CheckMailScreen()));
-      ToastMessage().toastMessage('Password reset email sent!', Colors.green);
+      ToastMessage().toastMessage('Correo electrónico de restablecimiento de contraseña enviado!', Colors.green);
       setState(() {
         loading = false;
       });
@@ -63,7 +63,7 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                         color: Theme.of(context).primaryColor,
                         child: const Center(
                           child: Text(
-                            'Budgeto',
+                            'CreaCode Finanzas',
                             style: TextStyle(
                                 fontSize: 50,
                                 fontWeight: FontWeight.bold,

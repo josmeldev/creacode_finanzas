@@ -41,34 +41,40 @@ class _SignupScreenState extends State<SignupScreen> {
 
       await _auth
           .createUserWithEmailAndPassword(
-              email: emailController.text.toString(),
-              password: confirmPassController.text.toString())
+            email: emailController.text.toString(),
+            password: confirmPassController.text.toString(),
+          )
           .then((value) {
-        ref.child(value.user!.uid.toString()).set({
-          'uid': value.user!.uid.toString(),
-          'email': value.user!.email.toString(),
-          'fullName': '',
-          'phoneNumber': '',
-          'bankAccNumber': '',
-          'age': '',
-          'kyc': '',
-          'incomeRange': '',
-          'profilePic': '',
-        });
+            ref.child(value.user!.uid.toString()).set({
+              'uid': value.user!.uid.toString(),
+              'email': value.user!.email.toString(),
+              'fullName': '',
+              'phoneNumber': '',
+              'bankAccNumber': '',
+              'age': '',
+              'kyc': '',
+              'incomeRange': '',
+              'profilePic': '',
+            });
 
-        debugPrint('split working');
+            debugPrint('split working');
 
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const VerifyEmailScreen()));
-        setState(() {
-          loading = false;
-        });
-      }).onError((error, stackTrace) {
-        ToastMessage().toastMessage(error.toString(), Colors.red);
-        setState(() {
-          loading = false;
-        });
-      });
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const VerifyEmailScreen(),
+              ),
+            );
+            setState(() {
+              loading = false;
+            });
+          })
+          .onError((error, stackTrace) {
+            ToastMessage().toastMessage(error.toString(), Colors.red);
+            setState(() {
+              loading = false;
+            });
+          });
     }
   }
 
@@ -89,11 +95,12 @@ class _SignupScreenState extends State<SignupScreen> {
                         color: Theme.of(context).primaryColor,
                         child: const Center(
                           child: Text(
-                            'Budgeto',
+                            'CreaCode\nFinanzas',
                             style: TextStyle(
-                                fontSize: 50,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
+                              fontSize: 50,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
@@ -101,12 +108,15 @@ class _SignupScreenState extends State<SignupScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 8, horizontal: 30),
+                            vertical: 8,
+                            horizontal: 30,
+                          ),
 
                           decoration: BoxDecoration(
                             color: Theme.of(context).cardColor,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(25)),
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(25),
+                            ),
                           ),
                           // color: Colors.white,
                           child: Form(
@@ -117,116 +127,116 @@ class _SignupScreenState extends State<SignupScreen> {
                               children: [
                                 SizedBox(height: constraints.maxHeight * 0.015),
                                 const Text(
-                                  'Create Account',
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                  ),
+                                  'Crear cuenta',
+                                  style: TextStyle(fontSize: 28),
                                 ),
-                                SizedBox(
-                                  height: constraints.maxHeight * 0.025,
-                                ),
+                                SizedBox(height: constraints.maxHeight * 0.025),
                                 CustomTextField(
                                   controller: emailController,
-                                  hint: 'Email',
+                                  hint: 'Correo',
                                   iconName: Icons.alternate_email,
                                   obscureText: false,
                                   validator: (value) {
                                     if (value!.isEmpty) {
-                                      return 'Enter Email';
+                                      return 'Ingresa un correo';
+                                    } else if (!RegExp(
+                                      r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+                                    ).hasMatch(value)) {
+                                      return 'Ingresa un correo válido';
                                     }
                                     return null;
                                   },
                                 ),
-                                SizedBox(
-                                  height: constraints.maxHeight * 0.025,
-                                ),
+                                SizedBox(height: constraints.maxHeight * 0.025),
                                 CustomTextField(
-                                  hint: 'Password',
+                                  hint: 'Contraseña',
                                   iconName: Icons.lock,
                                   obscureText: true,
                                   controller: passwordController,
                                   validator: (value) {
                                     if (value!.isEmpty) {
-                                      return 'Enter Password';
+                                      return 'Ingrese la contraseña';
+                                    } else if (value.length < 6) {
+                                      return 'La contraseña debe tener al menos 6 caracteres';
                                     }
                                     return null;
                                   },
                                 ),
-                                SizedBox(
-                                  height: constraints.maxHeight * 0.025,
-                                ),
+                                SizedBox(height: constraints.maxHeight * 0.025),
                                 CustomTextField(
-                                  hint: 'Confirm Password',
+                                  hint: 'Confirmar contraseña',
                                   iconName: Icons.lock,
                                   obscureText: true,
                                   controller: confirmPassController,
                                   validator: (value) {
                                     if (value!.isEmpty) {
-                                      return 'Enter Password';
+                                      return 'Ingrese la contraseña';
                                     }
                                     if (value != passwordController.text) {
-                                      return 'Password does not match';
+                                      return 'Las contraseñas no coinciden';
                                     }
                                     return null;
                                   },
                                 ),
-                                SizedBox(
-                                  height: constraints.maxHeight * 0.02,
-                                ),
+                                SizedBox(height: constraints.maxHeight * 0.02),
 
                                 const Center(
                                   child: Text(
-                                    'By signing up you’re agree to our Privacy Policy and Terms and Conditions',
+                                    'Al registrarte aceptas nuestra Política de privacidad y Términos y condiciones.',
                                     style: TextStyle(
-                                        fontSize: 14, color: kGrayTextC),
+                                      fontSize: 14,
+                                      color: kGrayTextC,
+                                    ),
                                   ),
                                 ),
 
-                                SizedBox(
-                                  height: constraints.maxHeight * 0.02,
-                                ),
+                                SizedBox(height: constraints.maxHeight * 0.02),
 
                                 // Container(child: TextB,)
                                 TButton(
                                   loading: loading,
                                   constraints: constraints,
                                   btnColor: Theme.of(context).primaryColor,
-                                  btnText: 'Continue',
+                                  btnText: 'Continuar',
                                   onPressed: signup,
                                 ),
-                                SizedBox(
-                                  height: constraints.maxHeight * 0.01,
-                                ),
+                                SizedBox(height: constraints.maxHeight * 0.01),
                                 Row(
                                   children: [
                                     const Text(
-                                      'Joined us?',
+                                      'Ya tienes una cuenta?',
                                       style: TextStyle(
-                                          color: kGrayTextC,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400),
+                                        color: kGrayTextC,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                      ),
                                     ),
                                     TextButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const LoginScreen()));
-                                        },
-                                        child: Text('Login',
-                                            style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .primaryColor,
-                                              fontSize: 16,
-                                            )))
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) =>
+                                                    const LoginScreen(),
+                                          ),
+                                        );
+                                      },
+                                      child: Text(
+                                        'Iniciar',
+                                        style: TextStyle(
+                                          color: Theme.of(context).primaryColor,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
                             ),
                           ),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 );

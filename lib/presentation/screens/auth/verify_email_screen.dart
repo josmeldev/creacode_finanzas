@@ -92,15 +92,15 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'A verification link has been\nsent to your email!',
+                    '¡Se ha enviado un enlace de\nverificacióna tu correo electrónico!',
                     style: TextStyle(
                         fontSize: 20, color: Theme.of(context).cardColor),
                     textAlign: TextAlign.center,
                   ),
                   CheckEmailWidget(
                       mailText:
-                          'You will get automatically logged\nin once you verify your email',
-                      btnText: 'Resend Email',
+                          'Iniciará sesión automáticamente una vez\nque verifique su correo electrónico.',
+                      btnText: 'Reenviar al correo',
                       onPressed: sendVerificationEmail),
                 ],
               ),
