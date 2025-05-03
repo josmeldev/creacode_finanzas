@@ -13,6 +13,7 @@ import '../../widgets/null_error_message_widget.dart';
 import '../auth/login_screen.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:creacode_finanzas/logic/flutter_toast.dart';
+import 'package:creacode_finanzas/presentation/widgets/text_field.dart';
 
 class UserProfileScreeen extends StatefulWidget {
   const UserProfileScreeen({super.key});
@@ -23,9 +24,12 @@ class UserProfileScreeen extends StatefulWidget {
 
 class _UserProfileScreeenState extends State<UserProfileScreeen> {
   final ref = FirebaseDatabase.instance.ref('Users');
-
   final user = FirebaseAuth.instance.currentUser!;
+  
+  // Define tu email específico aquí
+  final String adminEmail = "josmelvt@gmail.com"; // Cambia esto a tu email
 
+  
   void clearUserSplitData() async {
     // Mostrar diálogo de confirmación primero
     showDialog(
@@ -176,6 +180,7 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
       },
     );
   }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -202,6 +207,10 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
             );
           } else {
             Map<dynamic, dynamic> map = snapshot.data.snapshot.value;
+            
+            // Verificar si el usuario actual es el administrador
+            bool isAdmin = user.email == adminEmail;
+            
             return Scaffold(
               body: SafeArea(
                 child: LayoutBuilder(
@@ -228,8 +237,16 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
                                       ),
                                     ),
                                     
+                                    // Mostrar un badge pequeño si eres admin
+                                    if (isAdmin)
+                                      const Icon(
+                                        Icons.admin_panel_settings,
+                                        color: Colors.amber,
+                                      ),
                                   ],
                                 ),
+                                
+                                // Código existente sin cambios...
                                 SizedBox(height: constraints.maxHeight * 0.03),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -318,7 +335,30 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
                                     themeSwitch(context),
                                   ],
                                 ),
+                                
                                 SizedBox(height: constraints.maxHeight * 0.04),
+                                
+                                // Botón de administrador - solo visible para ti
+                                if (isAdmin)
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 15),
+                                    child: ElevatedButton.icon(
+                                      icon: const Icon(Icons.admin_panel_settings, color: Colors.white),
+                                      label: const Text(
+                                        'Crear Usuario (Admin)',
+                                        style: TextStyle(color: Colors.white, fontSize: 16),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.amber[800],
+                                        padding: const EdgeInsets.symmetric(vertical: 15),
+                                      ),
+                                      onPressed: () {
+                                        _showCreateUserDialog(context);
+                                      },
+                                    ),
+                                  ),
+                                
+                                // Botones existentes sin cambios...
                                 TButton(
                                   constraints: constraints,
                                   btnColor: Theme.of(context).primaryColor,
@@ -340,7 +380,7 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
                                   btnColor: Theme.of(context).primaryColor,
                                   btnText: 'Iniciar nuevo Mes',
                                   onPressed: () {
-                                    clearUserSplitData(); // Esto está bien, no debería haber ningún valor de retorno usado.
+                                    clearUserSplitData();
                                   },
                                 ),
 
@@ -365,6 +405,249 @@ class _UserProfileScreeenState extends State<UserProfileScreeen> {
     );
   }
 
+  // Método para mostrar diálogo de creación de usuario
+  void _showCreateUserDialog(BuildContext context) {
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+    final TextEditingController fullNameController = TextEditingController();
+    final TextEditingController phoneController = TextEditingController();
+    final TextEditingController accountNumberController = TextEditingController();
+    final TextEditingController dniController = TextEditingController();
+    final TextEditingController ageController = TextEditingController();
+    final TextEditingController incomeController = TextEditingController();
+    
+    final formKey = GlobalKey<FormState>();
+    bool isLoading = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Crear Nuevo Usuario',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        CustomTextField(
+                          hint: 'Correo electrónico',
+                          iconName: Icons.email,
+                          obscureText: false,
+                          controller: emailController,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Ingrese un correo';
+                            } else if (!RegExp(
+                              r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+                            ).hasMatch(value)) {
+                              return 'Ingrese un correo válido';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        CustomTextField(
+                          hint: 'Contraseña',
+                          iconName: Icons.lock,
+                          obscureText: true,
+                          controller: passwordController,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Ingrese una contraseña';
+                            } else if (value.length < 6) {
+                              return 'Mínimo 6 caracteres';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        CustomTextField(
+                          hint: 'Nombre completo',
+                          iconName: Icons.person,
+                          obscureText: false,
+                          controller: fullNameController,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Ingrese un nombre';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        CustomTextField(
+                          hint: 'Teléfono',
+                          iconName: Icons.phone,
+                          obscureText: false,
+                          controller: phoneController,
+                        ),
+                        const SizedBox(height: 10),
+                        CustomTextField(
+                          hint: 'Número de cuenta',
+                          iconName: Icons.account_balance,
+                          obscureText: false,
+                          controller: accountNumberController,
+                        ),
+                        const SizedBox(height: 10),
+                        CustomTextField(
+                          hint: 'DNI',
+                          iconName: Icons.badge,
+                          obscureText: false,
+                          controller: dniController,
+                        ),
+                        const SizedBox(height: 10),
+                        CustomTextField(
+                          hint: 'Edad',
+                          iconName: Icons.cake,
+                          obscureText: false,
+                          controller: ageController,
+                        ),
+                        const SizedBox(height: 10),
+                        CustomTextField(
+                          hint: 'Rango de ingresos',
+                          iconName: Icons.money,
+                          obscureText: false,
+                          controller: incomeController,
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: kGreenColor,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            onPressed: isLoading
+                                ? null
+                                : () async {
+                                    if (formKey.currentState!.validate()) {
+                                      setState(() {
+                                        isLoading = true;
+                                      });
+                                      
+                                      try {
+                                        // Guardar usuario actual (admin)
+                                        final currentAdmin = FirebaseAuth.instance.currentUser;
+                                        
+                                        // Crear usuario nuevo
+                                        UserCredential userCredential = 
+                                            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                                              email: emailController.text.trim(),
+                                              password: passwordController.text.trim(),
+                                            );
+                                        
+                                        // Crear estructura de datos exactamente como pediste
+                                        await ref.child(userCredential.user!.uid).set({
+                                          "age": ageController.text,
+                                          "bankAccNumber": accountNumberController.text,
+                                          "email": emailController.text.trim(),
+                                          "fullName": fullNameController.text,
+                                          "incomeRange": incomeController.text,
+                                          "kyc": dniController.text,
+                                          "phoneNumber": phoneController.text,
+                                          "profilePic": "",
+                                          "split": {
+                                            "amount": 0,
+                                            "collectedEmergencyFunds": 0,
+                                            "count": 1,
+                                            "expenses": 0,
+                                            "expensesAvailableBalance": 0,
+                                            "isAutopayOn": false,
+                                            "isCPenabled": false,
+                                            "isEFenabled": false,
+                                            "need": 0,
+                                            "needAvailableBalance": 0,
+                                            "savings": 0,
+                                            "targetEmergencyFunds": 0,
+                                            "totalBalance": 0,
+                                            "totalSavings": 0
+                                          },
+                                          "uid": userCredential.user!.uid
+                                        });
+                                        
+                                        // Volver a iniciar sesión como admin
+                                        if (currentAdmin != null) {
+                                          await FirebaseAuth.instance.signInWithEmailAndPassword(
+                                            email: adminEmail,
+                                            password: passwordController.text,
+                                          );
+                                        }
+                                        
+                                        if (mounted) {
+                                          ToastMessage().toastMessage(
+                                            'Usuario creado exitosamente', 
+                                            Colors.green
+                                          );
+                                          Navigator.of(context).pop();
+                                        }
+                                      } catch (error) {
+                                        ToastMessage().toastMessage(
+                                          'Error: ${error.toString()}',
+                                          Colors.red
+                                        );
+                                      } finally {
+                                        if (mounted) {
+                                          setState(() {
+                                            isLoading = false;
+                                          });
+                                        }
+                                      }
+                                    }
+                                  },
+                            child: isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Crear Usuario',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+        );
+      },
+    );
+  }
+
+  // Método existente sin cambios
   FlutterSwitch themeSwitch(BuildContext context) {
     final switchThemeIns = Provider.of<ThemeSwitch>(context);
     return FlutterSwitch(
